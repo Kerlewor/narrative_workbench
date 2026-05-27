@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "project": "NARRATIVE_WORKBENCH_TEMPLATE",
+  "currentChapter": 0,
+  "sourceOfTruth": "chapters/",
+  "canonicalOwner": "main-session",
+  "syncContract": "story/state_contract.md",
+  "stateFiles": [
+    "story/state/current_state.json",
+    "story/state/chapter_summaries.json",
+    "story/state/hooks.json"
+  ],
+  "runtimeStatuses": [
+    "planned",
+    "drafted",
+    "polished",
+    "reviewed",
+    "fixed",
+    "final-check",
+    "final-aligned",
+    "superseded",
+    "needs-repair",
+    "needs-rewrite"
+  ]
+}

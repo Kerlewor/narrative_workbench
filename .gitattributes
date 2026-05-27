@@ -1,0 +1,3 @@
+# Narrative Workbench is a Markdown prompt-engineering framework.
+# Python scripts are auxiliary tools, not the primary product.
+scripts/*.py linguist-generated=true

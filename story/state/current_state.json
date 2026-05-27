@@ -1,0 +1,19 @@
+{
+  "currentChapter": 0,
+  "currentLocation": "",
+  "protagonistState": "",
+  "currentGoal": "",
+  "currentAlliesEnemies": "",
+  "activeHooks": [],
+  "resolvedHooks": [],
+  "lastCanonicalUpdate": {
+    "chapter": 0,
+    "files": [],
+    "runtimeStatus": ""
+  },
+  "driftStatus": {
+    "checkedAtChapter": 0,
+    "hasDrift": false,
+    "notes": ""
+  }
+}
