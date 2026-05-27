@@ -1,0 +1,19 @@
+{
+  "hooks": [],
+  "schema": {
+    "hookId": "H001",
+    "startChapter": "number",
+    "type": "前台-悬念|后台-真相|情感-关系|人物-弧光|物件-证据|环境-状态|主题-回声",
+    "status": "open|progressing|escalated|resolved|dormant|dropped",
+    "priority": "core|high|normal|low",
+    "lastAdvanced": "number",
+    "expectedResolution": "string",
+    "targetVolumeOrChapter": "string",
+    "cadence": "立即|近期|中程|慢烧|终局",
+    "upstreamDependencies": "array",
+    "halfLife": "number",
+    "escalationCondition": "string",
+    "textEvidence": "string",
+    "notes": "string"
+  }
+}

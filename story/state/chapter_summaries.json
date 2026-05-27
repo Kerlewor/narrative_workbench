@@ -1,0 +1,14 @@
+{
+  "chapters": [],
+  "schema": {
+    "chapter": "number",
+    "title": "string",
+    "characters": "array",
+    "keyEvents": "array",
+    "stateChanges": "array",
+    "hookChanges": "array",
+    "tone": "string",
+    "chapterType": "string",
+    "sourceFile": "string"
+  }
+}

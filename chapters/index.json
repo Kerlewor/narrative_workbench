@@ -1,0 +1,11 @@
+{
+  "chapters": [],
+  "schema": {
+    "chapter": "number",
+    "title": "string",
+    "file": "string",
+    "status": "final",
+    "wordCount": "number",
+    "updatedAt": "string"
+  }
+}
