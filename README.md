@@ -33,10 +33,64 @@
 
 ## 快速开始
 
-1. 在此目录运行 `python3 scripts/create_project.py "新书名"`，进入生成的新书目录。
-2. 启动 Claude Code，发送 `START_HERE.md` 中的启动指令（或让 AI 读取 `CLAUDE.md`）。
-3. 对 AI 说 `搭建大纲`——AI 按五阶段推进：故事内核 → 前台/后台结构 → 分卷设计 → 角色设计（四轮讨论）→ 世界观铁律。已有大纲时说 `导入现成大纲`。
-4. 大纲完成后说 `写第1章` 或 `写接下来5章`。
+四步启动，上下两行分别展示终端命令和你对 AI 说的话：
+
+```text
+$ python3 scripts/create_project.py "临安雪"     # 步骤1：创建新书目录
+$ cd 临安雪 && claude                             # 步骤2：进入目录，启动 Claude Code
+```
+
+```text
+你: 这是一个 AI 小说项目。请读取 CLAUDE.md 然后按"会话启动"顺序读取上下文文件。
+    如果你有 Python 3，可以使用辅助脚本做确定性检查。
+
+AI: 好的。我先确认——你已安装 Python 3 吗？是否使用脚本？
+
+你: 已安装，使用脚本。
+
+AI: [读取 CLAUDE.md → RUN_RULES.md → system_protocol.md → ...]
+    上下文加载完成。当前项目是全新的，尚未搭建大纲。
+    要开始搭建大纲吗？
+```
+
+```text
+$ # 步骤3：搭建大纲（终端无操作，全部通过对话完成）
+```
+
+```text
+你: 搭建大纲
+
+AI: 好的。先确认基础定位——这本书一句话讲什么？
+
+你: 南宋绍兴年间，一个精通医术的女子为躲避金兵追杀，
+    伪装身份混入太医院，却卷入了宫廷内部的权力斗争。
+
+AI: [五阶段推进：故事内核 → 前台/后台结构 → 分卷设计 →
+    角色设计（四轮讨论）→ 世界观铁律]
+    大纲搭建完成。产出 story_frame.md、volume_map.md、
+    book_rules.md、角色卡、character_matrix.md。
+    要开始写第 1 章吗？
+```
+
+```text
+$ python3 scripts/doctor.py                        # 步骤4：体检后开始写作
+$ python3 scripts/structure_report.py
+```
+
+```text
+你: 写第1章
+
+AI: [drift check] → [创建 intent/plan] →
+    [Writer] 草稿 → [Polish] 润色 → [Review] 审阅 → [Fixer] 修复 →
+    [gatekeeper 通过] → [final-check 通过] →
+    第 1 章已写入 chapters/0001_临安雪.md
+
+你: 继续下一章        # 复用持久 Agent，无需重发基线
+你: 写接下来5章       # 流水线重叠，批末 audit
+你: 继续              # 持续写作，跨卷自动归档
+```
+
+已有大纲时，将步骤 3 的 `搭建大纲` 替换为 `导入现成大纲`。
 
 ## 用户命令
 
