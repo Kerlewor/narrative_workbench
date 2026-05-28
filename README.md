@@ -1,6 +1,6 @@
 # Narrative Workbench / 叙事工作台
 
-面向 Claude Code 与 Codex CLI 的 AI 小说写作工程框架——结构化大纲搭建、四 Agent 持久会话流水线、伏笔生命周期管理、角色人格深度设计、去 AI 味文风控制。
+面向 Claude Code 与 Codex CLI 的长篇 AI 小说工程框架——不是手动工具台，而是一套自主调度 Agent、管理项目状态、追踪伏笔生命周期、校验流程完整性的写作工程系统。
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Claude%20Code%20%7C%20Codex%20CLI-green)
