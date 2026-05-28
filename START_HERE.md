@@ -5,6 +5,8 @@
 ```text
 这是一个 AI 小说项目。请先读取项目根目录的 CLAUDE.md，然后按 CLAUDE.md 的"会话启动"顺序读取上下文文件，尤其是 RUN_RULES.md、system_protocol.md、state_contract.md 和 hook_protocol.md。
 
+在读取上下文文件之前，请先询问用户：是否安装了 Python 3 环境，以及是否希望使用 Python 辅助脚本进行确定性检查。如果用户无 Python 或不使用脚本，后续所有脚本运行步骤改为 AI 手动执行等效检查。
+
 如果 Claude Code 可用，请优先调用 `project-librarian` 生成 Context Packet。Context Packet 可以替代 current_state.md、chapter_summaries.md、current_focus.md、RUN_RULES.md 的读取，但不能替代 system_protocol.md、state_contract.md、hook_protocol.md、story_frame.md、volume_map.md。Packet 与原文冲突时以原文为准。
 
 如果当前目录是 `_frameworks/narrative_workbench`，这是模板目录。除非用户明确要求修改模板，不要直接在这里搭建大纲或写正文。应先运行：

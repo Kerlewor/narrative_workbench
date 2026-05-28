@@ -35,7 +35,15 @@ agents/                四 Agent 提示词
 
 ## 会话启动
 
-每次新会话必须先读取以下文件。若 Claude Code 可用，应先调用 `project-librarian` 生成 `Context Packet`，用于压缩本轮必读上下文；Context Packet 只是导航图，不能替代原始文件和正文事实源。
+每次新会话开始后，**首先询问用户 Python 环境状态：**
+
+> 在开始之前，请确认：你的环境中是否安装了 Python 3？是否希望使用 Python 辅助脚本进行确定性检查？
+> - 有 Python 且使用脚本：脚本负责文件完整性、JSON 合法性、hook 半衰期、文本审计等确定性检查，AI 负责创作判断。
+> - 无 Python 或不使用脚本：AI 将手动执行等效检查（读取文件逐项验证），可靠性略低于脚本但功能完整。
+
+根据用户回答，后续流程中所有标注为"必须"的脚本运行步骤，在无 Python 环境下由 AI 手动执行等效检查。
+
+每次新会话必须读取以下文件。若 Claude Code 可用，应先调用 `project-librarian` 生成 `Context Packet`，用于压缩本轮必读上下文；Context Packet 只是导航图，不能替代原始文件和正文事实源。
 
 1. `story/current_focus.md` - 下一步写什么
 2. `story/current_state.md` - 当前章节、地点、人物状态、敌我关系

@@ -10,6 +10,26 @@
 4. 不得把脚本输出当成语义结论。脚本只指出结构、格式、预算、依赖和同步问题。
 5. 若当前目录是 `_frameworks/narrative_workbench`，除非用户明确要求修改模板，否则先用 `create_project.py` 创建新项目。
 
+### Python 不可用时的降级规则
+
+当用户无 Python 环境或选择不使用脚本时，AI 必须手动执行以下等效检查：
+
+| 脚本 | 降级方案 |
+|---|---|
+| `doctor.py` | AI 逐项检查：核心文件存在性（对照 REQUIRED_FILES 列表）、JSON 可解析性、agent frontmatter 格式、hook 表头合法性、runtime 状态枚举 |
+| `chapter_index.py` | AI 扫描 `chapters/` 目录，手动更新 `chapters/index.json` |
+| `text_audit.py` | AI 扫描候选稿全文，对照 `style_blacklist.md` 逐项检查 |
+| `hook_report.py` | AI 读取 `pending_hooks.md`，人工计算活跃 hook 数、core 数、半衰期到期项 |
+| `hook_matrix.py` | AI 检查 hook 依赖环、阻塞关系、回收元数据完整性 |
+| `structure_report.py` | AI 对比章节文件、摘要、弧光、runtime、索引的覆盖关系 |
+| `gatekeeper.py` | AI 逐项执行 gatekeeper 检查清单：流水线产物完整性、Review→Fixer 响应覆盖、hook 同步、禁止模式、intent 状态 |
+| `skill_check.py` | AI 检查 skill 注册表表头、名称合法性和入口文件存在性 |
+| `context_builder.py` | AI 按 Agent 类型手动收集必读文件、压缩摘要、排除文件，构建上下文包 |
+| `prompt_compiler.py` | AI 按三层结构手动拼接 Agent prompt |
+| 其余新脚本 | AI 执行等效的手动检查或分析 |
+
+降级模式下的产物应写入与脚本相同的 runtime 路径，并标注 `(manual)` 以区分。
+
 ## 阶段门禁
 
 | 阶段 | 必须运行 | 结果写入 |
