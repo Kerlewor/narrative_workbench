@@ -32,6 +32,10 @@ python3 scripts/create_project.py "项目名"
 - "写接下来 3-5 章"
 - "审阅第 N 章"
 - "导入现成大纲"
+- "审查第 N 章"（共创模式：审查手写稿，不改正文）
+- "润色第 N 章 --模式 light"（共创模式：5 种润色模式可选）
+- "第 N 章写作简报"（动笔前生成约束简报）
+- "深化角色 <角色名>"
 
 写作时使用 Writer -> Polish -> Review -> Fixer 四 Agent 流水线。Agent 是持久会话——首次创建后在同一主会话内持续存活，后续章节无需重复发送项目基线。主会话在写前 SOP 中完成 hook 盘点、角色盘点和弧光分析，将结论写入 intent/plan 驱动 Agent。Agent 持续处理超过 8 章后主会话应主动重置。
 
@@ -55,5 +59,5 @@ Agent 只能写 story/runtime/ 中的 working 文件，canonical 状态由主会
 - `.claude/agents/novel-*.md` 是 Claude Code 写作 subagent 注册文件（持久会话，薄路由层，详细指令在 `agents/*.md`）。
 - `agents/*.md` 是各 Agent 的详细职责说明，subagent 和主会话均按需读取。
 - 如果 Claude Code 没有自动调用 subagent，可以显式要求："先调用 project-librarian 生成 Context Packet"，或"调用 novel-writer / novel-polish / novel-review / novel-fixer 执行对应阶段"。
-- 写作过程中请自动使用 Python 辅助脚本：初始化和批末运行 `doctor.py`，写后运行 `chapter_index.py --write`，final-check 前运行 `text_audit.py`，规划/批量前运行 `hook_report.py --current N` 和 `hook_matrix.py --current N`，新卷/批末运行 `structure_report.py`。
+- 写作过程中请自动使用 Python 辅助脚本：初始化和批末运行 `doctor.py`，各 Agent 前建议运行 `context_builder.py` + `prompt_compiler.py` 编译上下文和 prompt，final-check 前**必须**运行 `gatekeeper.py` + `text_audit.py`，写后运行 `chapter_index.py --write`，规划/批量前运行 `hook_report.py --current N` 和 `hook_matrix.py --current N`，新卷/批末运行 `structure_report.py`。
 - 脚本运行门禁以 `RUN_RULES.md` 为准；脚本报 ERROR 必须先修复，WARN 必须写入对应 runtime 文件并说明处理。
