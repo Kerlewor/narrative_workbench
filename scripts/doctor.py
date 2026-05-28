@@ -24,6 +24,14 @@ REQUIRED_FILES = [
     "scripts/context_builder.py",
     "scripts/prompt_compiler.py",
     "scripts/gatekeeper.py",
+    "scripts/knowledge_index.py",
+    "scripts/status.py",
+    "scripts/style_report.py",
+    "scripts/character_drift_report.py",
+    "scripts/decompose_style.py",
+    "scripts/import_inkos_project.py",
+    "scripts/review_author_chapter.py",
+    "scripts/polish_author_chapter.py",
     "skills/skill_protocol.md",
     "skills/skill_registry.md",
     "skills/_template.skill-entry.md",
@@ -246,7 +254,7 @@ class Doctor:
             rel = path.relative_to(ROOT)
             match = re.search(r"^status:\s*([A-Za-z0-9_-]+)\s*$", text, re.MULTILINE)
             if not match:
-                skip_patterns = ("_template.", ".context.md", ".gatekeeper.md")
+                skip_patterns = ("_template.", ".context.md", ".gatekeeper.md", ".prompt.md", ".knowledge_packet.md", ".style_report.md", ".character_drift.md", ".author_review_brief.md", ".author_polish_")
                 if not any(path.name.endswith(p) or path.name.startswith(p.lstrip(".")) for p in skip_patterns):
                     self.warn(f"runtime file has no status: {rel}")
                 continue

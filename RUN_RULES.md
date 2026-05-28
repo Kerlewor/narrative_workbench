@@ -44,6 +44,14 @@
 | `context_builder.py` | 按 Agent 类型和章节构建上下文包，控制 token 预算 | 替代主模型判断哪些文件该读 |
 | `prompt_compiler.py` | 按三层结构编译 Agent prompt（Base + 项目规则 + 本章任务） | 替代主模型手动拼接 prompt |
 | `gatekeeper.py` | 检查流水线产物完整性、Review→Fixer 响应覆盖、hook 同步、禁止模式 | 替代主模型做创造性判断 |
+| `knowledge_index.py` | 扫描项目文件构建实体索引，支持关键词查询和知识包生成 | 替代全文语义理解 |
+| `status.py` | 项目状态概览：章节进度、hook 统计、角色漂移风险、建议下一步 | 替代主模型手动盘点 |
+| `style_report.py` | 分析章节句长分布、对白密度、AI 味模式命中 | 润色正文 |
+| `character_drift_report.py` | 对照角色约束扫描章节文本，输出疑似漂移预警 | 做最终漂移判断 |
+| `decompose_style.py` | 输入文本 → 输出 style_analysis.md + style_profile.json + style_skill.md | 替代人工文风分析 |
+| `import_inkos_project.py` | 将 InkOS 项目文件映射迁移到 Narrative Workbench | 处理语义不兼容内容 |
+| `review_author_chapter.py` | 为手写章节生成 Review 审查简报（共创模式） | 替代 Review Agent |
+| `polish_author_chapter.py` | 为手写章节生成 Polish 润色简报（共创模式，5 种模式） | 替代 Polish Agent |
 
 ## 失败处理
 

@@ -142,9 +142,14 @@ v0.2.0 在"AI 全流程写作"之外新增了"作者手写 + AI 辅助"的共创
 
 | v0.1.0 | v0.2.0 |
 |---|---|
-| 8 个 | 11 个 |
+| 8 个 | 18 个 |
 
-新增：`context_builder.py`、`prompt_compiler.py`、`gatekeeper.py`
+新增 10 个：
+- 上下文工程：`context_builder.py`、`prompt_compiler.py`
+- 流程确定性：`gatekeeper.py`
+- 知识库与状态：`knowledge_index.py`、`status.py`
+- 文风与角色：`style_report.py`、`character_drift_report.py`、`decompose_style.py`
+- 共创与兼容：`review_author_chapter.py`、`polish_author_chapter.py`、`import_inkos_project.py`
 
 ## 设计决策
 
