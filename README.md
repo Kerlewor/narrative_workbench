@@ -109,6 +109,8 @@ Review（审阅报告）
 
 **批量流水线：** 同一章内严格串行。多章批量时，Writer 完成 ChN 后立即收到 ChN+1 任务，同时 Polish 正在处理 ChN——不同章节的 Agent 阶段可流水线重叠。
 
+**Subagent 与模型分配：** Claude Code 自动发现 `.claude/agents/` 中的 5 个 subagent。你可以在对话中查询可用 subagent 列表，并为不同阶段分配不同模型——例如 Writer 用快速模型节省成本，Review 用高精度模型保证审查质量。详见 [PROJECT_INTRO.md](PROJECT_INTRO.md)。
+
 ## Skill 扩展机制
 
 Skill 是可插拔的专项能力模块，用于扩展写作流水线的特定环节。适用场景：特定题材知识（如医学考据、古代官制）、专项文风规则、章节审校清单、战斗/悬疑/恋爱等专项构造。
