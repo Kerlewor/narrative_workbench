@@ -60,6 +60,8 @@ AI: [运行 create_project.py] 项目已创建。要开始搭建大纲吗？
 
 没有 Python 也没关系——AI 会手动执行等效检查。已有大纲时，将 `搭建大纲` 替换为 `导入现成大纲`。
 
+如果只想先看看项目长什么样，打开 [`examples/linan_snow_demo/`](examples/linan_snow_demo/)——它是一个完整的最小演示项目，包含角色卡、伏笔池、intent/plan 和一篇手写稿，可以直接跑脚本验证。
+
 ## 用户命令
 
 | 命令 | 说明 |
