@@ -350,7 +350,7 @@ AI:   [decompose_style.py --input chapters/drafts/chapter-0001.author.md] →
 - **Python 脚本只做确定性检查，不做语义判断。** gatekeeper 通过不代表章节质量合格——只代表流程完整。创作质量的最终判断权在主会话和作者。
 - **知识库第一版基于关键词和元数据，不支持语义检索。** 精确匹配可能漏掉相关但措辞不同的内容。后续版本可考虑引入 embedding 检索。
 - **长篇项目状态文件随章节数线性增长。** `chapter_summaries.md` 和 `emotional_arcs.md` 已支持按卷分段，但数百章后仍需人工管理。
-- **共创模式的手写稿路径约定为 `chapters/drafts/`，** 该目录需用户自行创建。AI 不会自动创建此目录。
+- **共创模式的手写稿路径约定为 `chapters/drafts/`，** 首次使用时由 AI 自动创建。
 - **InkOS 迁移器仅处理文件级映射。** SQLite memory.db、Zod JSON delta 和 `particle_ledger.md` 等 InkOS 特有组件无法自动迁移，会标记为"需手动审核"。
 - **目前没有 Web UI 或后台自动调度器。** 调度完全由主会话通过 CLAUDE.md 协议完成，适合交互式使用但不适合无人值守的批量生成。
 

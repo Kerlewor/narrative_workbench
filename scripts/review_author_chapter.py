@@ -68,6 +68,7 @@ def chapter_prefix(chapter: int) -> str:
 
 def find_author_draft(chapter: int) -> Optional[Path]:
     drafts_dir = ROOT / "chapters/drafts"
+    drafts_dir.mkdir(parents=True, exist_ok=True)
     prefix = chapter_prefix(chapter)
     candidate = drafts_dir / f"{prefix}.author.md"
     if candidate.is_file():
@@ -94,7 +95,9 @@ def main() -> int:
 
     if not source_path or not source_path.is_file():
         print(f"手写稿不存在: {source_path}")
-        print("请将手写章节放入 chapters/drafts/chapter-XXXX.author.md")
+        drafts_dir = ROOT / "chapters/drafts"
+        drafts_dir.mkdir(parents=True, exist_ok=True)
+        print(f"已创建目录 {drafts_dir.relative_to(ROOT)}/，请将手写章节放入此目录。")
         return 1
 
     text = source_path.read_text(encoding="utf-8")

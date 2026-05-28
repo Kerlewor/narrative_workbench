@@ -294,7 +294,7 @@ python3 scripts/doctor.py
 
 执行流程：
 
-1. 确认作者手写稿位置：`chapters/drafts/chapter-000N.author.md` 或用户指定路径。
+1. 确认作者手写稿位置：`chapters/drafts/chapter-000N.author.md`（目录不存在时自动创建）或用户指定路径。
 2. 读取手写稿和相关角色卡、伏笔池、当前状态。
 3. 调用 Review Agent 进行一致性审查。**Review 不直接改文**，只输出问题清单：
    - 是否违背角色人格（对照 Personality Lock 和 Behavioral Constraints）；
