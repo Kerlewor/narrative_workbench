@@ -194,6 +194,50 @@ agents/review.md
 agents/fixer.md
 ```
 
+### 查看已注册的 Subagent 与分配模型
+
+Claude Code 和 Codex CLI 会自动发现 `.claude/agents/` 中的 subagent 注册文件。你可以通过主会话查询当前可用的 subagent 列表，并根据需要为不同 Agent 分配不同模型。
+
+**查询已注册的 subagent：**
+
+```text
+你: 当前项目有哪些可用的 subagent？列出它们的名称和职责。
+
+AI: 当前注册了 5 个 subagent：
+
+| Subagent | 类型 | 职责 | 会话模型 |
+|---|---|---|---|
+| project-librarian | 上下文路由 | 读取规则和状态，生成 Context Packet | 一次性 |
+| novel-writer | Writer 阶段 | 写原始草稿 | 持久 |
+| novel-polish | Polish 阶段 | 去 AI 味、校准文风 | 持久 |
+| novel-review | Review 阶段 | 审阅，找 bug 和漂移 | 持久 |
+| novel-fixer | Fixer 阶段 | 按 Review 报告修复 | 持久 |
+```
+
+**为不同 Agent 分配不同模型：**
+
+Claude Code 支持按 subagent 分配模型。例如在 `.claude/settings.json` 中：
+
+```json
+{
+  "permissions": {
+    "allow": ["Bash(python3 scripts/*)"]
+  }
+}
+```
+
+或在对话中直接指定：
+
+```text
+你: 写第 3 章时，Writer 用 claude-sonnet-4-6，Review 用 claude-opus-4-7
+
+AI: 好的。已记录：Writer → sonnet，Review → opus。
+      Writer 草稿由 sonnet 生成，速度和成本更优；
+      Review 审阅由 opus 执行，审查更细致。
+```
+
+这样可以为不同阶段选择不同性价比的模型——起草阶段用快速模型，审阅阶段用高精度模型。
+
 ## 7. Canonical 与 Working 边界
 
 本框架严格区分 canonical 区和 working 区。
