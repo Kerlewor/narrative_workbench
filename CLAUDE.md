@@ -239,9 +239,10 @@ python3 scripts/doctor.py
 4. Polish 根据风格规则润色草稿，输出到 `story/runtime/chapter-000N.polish.md`。
 5. Review 对润色稿出具审阅报告，输出到 `story/runtime/chapter-000N.review.md`。若 Review 判定结构性失败（`needs-rewrite`），将 Review Report 一并发送给 Writer，回到步骤 3 重写。
 6. Fixer 只按审阅报告修正，输出到 `story/runtime/chapter-000N.fixer.md`。
-7. 主会话创建 `story/runtime/chapter-000N.final-check.md`，执行定稿门禁检查。
+7. 运行 `python3 scripts/gatekeeper.py --chapter N --stage final` 做确定性门禁检查。gatekeeper 通过后，主会话创建 `story/runtime/chapter-000N.final-check.md`，执行定稿门禁检查。
    - 通过：继续步骤 8。
-   - 未通过（`needs-repair`）：将本章 intent.md 状态设为 `needs-repair`，将 final-check 报告发送给 Fixer，返回步骤 6 重新修复；或标记为 `superseded`（放弃本章）。
+   - gatekeeper 阻塞：修复阻塞问题后重新运行 gatekeeper。
+   - 未通过 final-check（`needs-repair`）：将本章 intent.md 状态设为 `needs-repair`，将 final-check 报告发送给 Fixer，返回步骤 6 重新修复；或标记为 `superseded`（放弃本章）。
 8. 主会话写入 `chapters/000N_标题.md`。
 9. 主会话按 `state_contract.md` 顺序同步 `current_state.md`、`chapter_summaries.md`、`pending_hooks.md`、`emotional_arcs.md`、`story/state/*.json`。
 10. 将本章 runtime 标记为 `status: final-aligned`。
@@ -326,7 +327,7 @@ Writer、Polish、Review、Fixer 四个写作 Agent 在同一主会话内**持�
 ### 会话管理
 
 - **创建：** 首次写第 1 章时，主会话创建四个 Agent，各发送一份项目基线。Agent 首次响应确认已理解。
-- **恢复：** 后续章节，主会话向已有 Agent 发送本章驱动文件即可。不重建 Agent。
+- **恢复：** 后续章节，主会话向已有 Agent 发送本章驱动文件即可。不重建 Agent。建议先运行 `python3 scripts/context_builder.py --chapter N --agent <agent>` 生成上下文包，避免手动拼接输入。
 - **重置触发条件：** 满足以下任一条件时，主会话结束当前 Agent 会话并创建替代：
   - Agent 已连续处理 **8 章以上**（上下文积累导致质量下降风险）。
   - Agent 输出出现角色漂移、事实矛盾或风格偏离，且纠正无效。

@@ -21,6 +21,8 @@ REQUIRED_FILES = [
     "RUN_RULES.md",
     "PROJECT_INTRO.md",
     "scripts/create_project.py",
+    "scripts/context_builder.py",
+    "scripts/gatekeeper.py",
     "skills/skill_protocol.md",
     "skills/skill_registry.md",
     "skills/_template.skill-entry.md",
@@ -243,7 +245,8 @@ class Doctor:
             rel = path.relative_to(ROOT)
             match = re.search(r"^status:\s*([A-Za-z0-9_-]+)\s*$", text, re.MULTILINE)
             if not match:
-                if not path.name.startswith("_template."):
+                skip_patterns = ("_template.", ".context.md", ".gatekeeper.md")
+                if not any(path.name.endswith(p) or path.name.startswith(p.lstrip(".")) for p in skip_patterns):
                     self.warn(f"runtime file has no status: {rel}")
                 continue
             status = match.group(1)
