@@ -107,57 +107,32 @@ skill 输出进入 story/runtime/chapter-000N.skill-SKILLNAME.md
 
 **边界：** skill 不直接改正文和 canonical 状态。skill 输出与项目禁令冲突时，以项目禁令为准。
 
-## 上下文工程
-
-v0.2.0 引入两个脚本，将"该给 Agent 什么信息"从主模型的主观判断转变为可复现的确定性流程。
-
-**context_builder.py — 上下文构建器：** 按 Agent 类型和章节自动构建上下文包，替代主模型手动判断"该读什么文件"。
-
-```bash
-python3 scripts/context_builder.py --chapter 12 --agent writer
-```
-
-每种 Agent 有独立的必读内容、压缩摘要和排除文件配置，内置 token 预算（Writer 18K / Polish 12K / Review 15K / Fixer 8K）。输出包含 6 个区块：必读内容 + 压缩摘要 + 禁止泄露提示 + 输出契约 + 省略文件清单 + 预算摘要。
-
-**prompt_compiler.py — Prompt 编译器：** 将 Agent prompt 拆为三层编译，使每次输入可复现、可追溯。
-
-```text
-Layer 1: Base Prompt（agents/<agent>.md 全文，永不变更）
-Layer 2: 项目规则（book_rules + style_blacklist + style_profile，极少变更）
-Layer 3: 本章任务（intent + plan + context packet + 半衰期风险提示，每章更新）
-```
-
-Layer 1 在持久会话中仅在 Agent 首次创建时发送，Layer 2 在项目配置变更时更新，Layer 3 每章由 prompt_compiler 编译发送。这样持久会话的"无需重发基线"优势得以保持。
-
-## 确定性门禁
-
-**gatekeeper.py** 在 final-check 之前运行，检查流水线是否完整。所有检查都是确定性验证，不依赖 AI 判断。
-
-```bash
-python3 scripts/gatekeeper.py --chapter 12 --stage final
-```
-
-检查维度：流水线产物完整性（intent/plan/writer/polish/review/fixer 是否全部存在）、Review→Fixer 响应覆盖（必修问题是否被逐条处理）、hook 半衰期同步（是否有到期未处理的活跃伏笔）、禁止模式（括号内心独白、非标准引号）、AI 味高频词句（WARN 不阻塞）。
-
-输出 `PASSED` 或 `FAILED` + 阻塞问题清单。gatekeeper 通过不代表章节质量合格——只代表流程完整。RUN_RULES 规定 gatekeeper 是 final-check 前**必须**运行的脚本，FAILED 时不得继续。
-
 ## 共创模式
 
-在"AI 全流程写作"之外，v0.2.0 新增了"作者手写 + AI 辅助"的共创模式，面向有写作能力、需要工程化辅助的作者。
+在"AI 全流程写作"之外，v0.2.0 新增了"作者手写 + AI 辅助"的共创模式，面向有写作能力、需要工程化辅助的作者。三种指令覆盖了写作前、写作后和修改阶段：
 
-**审查第 N 章：** 对作者手写章节进行一致性审查。Review Agent 不改正文，只出问题清单——角色人格违背、伏笔遗漏、秘密泄露风险、状态冲突、节奏失衡、AI 味。每条标注位置和修改方向，是否采纳由作者决定。
+```
+写作前：第 N 章写作简报
+  ↓  系统根据该章在卷纲中的位置和当前项目状态，生成约束简报——
+  ↓  本章类型、必须推进的伏笔、禁止泄露的信息、推荐写法。
+  ↓  不是替作者写，而是告诉作者这一章承担什么功能。
 
-**润色第 N 章：** 5 种润色模式，默认不覆盖原稿，所有改动标注位置和原因。
+写作后：审查第 N 章
+  ↓  Review Agent 对作者手写章节进行一致性审查。
+  ↓  不改正文，只出问题清单：角色人格违背、伏笔遗漏、秘密泄露风险、
+  ↓  状态冲突、节奏失衡、AI 味。每条标注位置和修改方向。
 
-| 模式 | 说明 |
+修改时：润色第 N 章 --模式 <模式名>
+  ↓  5 种润色模式，默认不覆盖原稿，所有改动标注位置和原因。
+```
+
+| 润色模式 | 说明 |
 |---|---|
-| `preserve-author-style` | 只改病句、重复、节奏，最大保留作者表达 |
-| `project-style-align` | 按项目文风 profile 对齐 |
-| `anti-ai-only` | 只去 AI 味 |
-| `dialogue-only` | 只修对白，对齐角色卡的对白风味 |
-| `rhythm-only` | 只调节奏：段落长短、喘息比例、章尾落点 |
-
-**第 N 章写作简报：** 作者动笔前，系统根据该章在卷纲中的位置和当前项目状态生成约束简报——本章类型、必须推进的伏笔、禁止泄露的信息、推荐写法。不是替作者写，而是告诉作者这一章承担什么功能。
+| `preserve-author-style` / `light` | 只改病句、重复、节奏，最大保留作者表达 |
+| `project-style-align` / `style` | 按项目文风 profile 对齐句长、对白密度、段落形态 |
+| `anti-ai-only` / `anti-ai` | 只去 AI 味：模板感、解释感、抽象情绪词 |
+| `dialogue-only` / `dialogue` | 只修对白，让角色声音与角色卡的对白风味对齐 |
+| `rhythm-only` / `rhythm` | 只调节奏：段落长短、高压喘息比例、章尾落点 |
 
 ## 目录结构
 
