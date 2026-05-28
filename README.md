@@ -148,7 +148,7 @@ story/
   roles/           角色卡（含 Personality Lock、压力测试）
   state/           JSON 状态镜像
   style_samples/   用户风格样本
-  *.md             状态账本与风格规则（18 个文件）
+  *.md             状态账本与风格规则（19 个文件）
 skills/            可插拔 skill 接口与注册表
 scripts/           19 个 Python 确定性辅助脚本
 chapters/          正文章节（000N_标题.md）
