@@ -2,8 +2,9 @@
 """Co-writing: Review Author Chapter.
 
 Prepares an author-written chapter for Review Agent analysis.
-Does NOT modify the original text. Outputs a review brief that the
-main session sends to the Review Agent.
+This script generates a structured review brief — it does NOT call any
+AI model, does NOT perform semantic review, and does NOT modify text.
+The actual review is performed by Claude Code/Codex via the Review Agent.
 
 Usage:
     python3 scripts/review_author_chapter.py --chapter 12

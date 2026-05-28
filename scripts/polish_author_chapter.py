@@ -2,6 +2,9 @@
 """Co-writing: Polish Author Chapter.
 
 Prepares an author-written chapter for Polish Agent processing.
+This script generates a structured polish brief — it does NOT call any
+AI model, does NOT perform semantic polishing, and does NOT modify text.
+The actual polishing is performed by Claude Code/Codex via the Polish Agent.
 Supports 5 polish modes. Does NOT overwrite the original.
 
 Usage:

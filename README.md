@@ -175,7 +175,9 @@ skill 输出进入 story/runtime/chapter-000N.skill-SKILLNAME.md
 | **知识与迁移** | `knowledge_index.py` / `import_inkos_project.py` / `structure_report.py` / `skill_check.py` | 项目知识索引、InkOS 项目迁移、结构覆盖检查、Skill 注册校验 |
 | **共创辅助** | `review_author_chapter.py` / `polish_author_chapter.py` / `create_project.py` | 手写稿审查简报、手写稿润色简报、新项目创建 |
 
-运行门禁见 `RUN_RULES.md`。详细说明见 [`scripts/README.md`](scripts/README.md)。
+**所有脚本都是确定性工具——不调用 AI 模型、不自动改写正文、不替代主会话的创作判断。** 审查和润色脚本生成的是结构化任务包，真正的语义审查/润色由 Claude Code/Codex 的 Agent 完成。
+
+运行门禁见 `RUN_RULES.md`。详细说明见 [`scripts/README.md`](scripts/README.md)。演示项目见 [`examples/linan_snow_demo/`](examples/linan_snow_demo/)。
 
 ## 知识库系统
 
