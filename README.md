@@ -1,13 +1,18 @@
 # Narrative Workbench / 叙事工作台
 
-面向 Claude Code 与 Codex CLI 的长篇 AI 小说工程框架——不是手动工具台，而是一套自主调度 Agent、管理项目状态、追踪伏笔生命周期、校验流程完整性的写作工程系统。
+面向 Claude Code 与 Codex CLI 的长篇 AI 小说工程框架。为长篇小说提供状态管理、伏笔追踪、角色一致性审查、文风对齐和 AI 辅助流水线——不是替作者写完一本书，而是让作者把小说创作当成工程来管理。
+
+支持两种创作模式：**AI 流水线写作**（规划→起草→润色→审阅→修复）和**共创模式**（作者手写 + AI 审查 + AI 按需介入润色）。19 个确定性 Python 脚本负责检查、索引和门禁，AI 负责创作判断。
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Claude%20Code%20%7C%20Codex%20CLI-green)
+[![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/)
 
 ## 起源与定位
 
-本项目受 **[InkOS](https://github.com/Narcooo/inkos)**（AGPL-3.0）启发——InkOS 首创了多 Agent 小说生产流水线、真相文件状态管理和 hook 生命周期追踪的方法论。Narrative Workbench 将这些模式重新构想为面向 Claude Code 与 Codex CLI 的 Markdown-native prompt 工程框架。
+本项目受 **[InkOS](https://github.com/Narcooo/inkos)**（AGPL-3.0）启发——InkOS 首创了多 Agent 小说生产流水线、真相文件状态管理和 hook 生命周期追踪的方法论。Narrative Workbench 将这些模式独立重新构想为 Markdown-native prompt 工程框架，并在此基础上扩展了持久 Agent 会话、角色人格深度设计、上下文编译、确定性门禁和共创模式。
+
+**定位：** 不是"AI 代写工具"，而是为有写作追求的作者提供的工程化辅助系统。你手写核心章节，AI 负责审查一致性和局部润色；你设计大纲，AI 负责起草过渡章并同步状态。你始终掌控故事，AI 负责记住第 3 章埋的伏笔在第 47 章该回收了。
 
 |  | InkOS | Narrative Workbench |
 |---|---|---|
