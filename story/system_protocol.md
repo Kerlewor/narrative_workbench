@@ -161,4 +161,5 @@ Python 脚本不允许做：
 6. 格式规则通过（含 style_blacklist、scene beat 落点）。
 7. Agent 输出没有审阅报告残留。
 8. canonical 状态更新清单明确。
-9. Python 辅助脚本已运行（text_audit.py、chapter_index.py、必要时 hook_report.py / hook_matrix.py）。
+9. gatekeeper.py 已通过（确定性门禁——流水线完整性、Review→Fixer 响应覆盖、hook 同步、禁止模式）。
+10. Python 辅助脚本已运行（text_audit.py、chapter_index.py、必要时 hook_report.py / hook_matrix.py）。

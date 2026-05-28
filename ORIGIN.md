@@ -32,8 +32,13 @@ Narrative Workbench 是一个受 InkOS 启发的独立 Markdown-native 实现。
 - **信息流向架构：** 主会话集中完成 hook 审计、角色审计、弧光差值分析和 drift check，将结论写入 intent/plan。Agent 只读本章驱动文件。
 - **Claude Code Subagent 集成层：** `.claude/agents/` 薄路由包装器，委托到 `agents/` 中的详细 prompt。
 - **Skill 协议与注册表：** 可插拔 skill 系统，含注册、校验（`skill_check.py`）和请求模板。
-- **所有 Python 辅助脚本：** `doctor.py`、`chapter_index.py`、`text_audit.py`、`hook_report.py`、`hook_matrix.py`、`structure_report.py`、`skill_check.py`、`create_project.py`。
-- **所有 Prompt 文本与模板：** `agents/`、`story/runtime/`、`story/outline/`、`story/roles/`、`skills/`、`.claude/agents/` 中的每个 Markdown 文件均为独立编写。
+- **v0.2.0 上下文工程：** `context_builder.py`（按 Agent 构建上下文包 + token 预算）、`prompt_compiler.py`（三层 prompt 编译）、`gatekeeper.py`（确定性门禁检查）。
+- **v0.2.0 知识库与状态：** `knowledge_index.py`（关键词+元数据项目索引）、`status.py`（项目状态概览）。
+- **v0.2.0 文风与角色：** `style_report.py`（定量文风报告）、`character_drift_report.py`（角色漂移预警）、`decompose_style.py`（文风拆解器，输入文本 → analysis + profile + skill）。
+- **v0.2.0 共创与兼容：** `review_author_chapter.py` / `polish_author_chapter.py`（共创模式简报生成）、`import_inkos_project.py`（InkOS 项目迁移器）。
+- **Python 环境降级方案：** 无 Python 时 AI 手动执行等效检查，产物标注 `(manual)`。
+- **共创模式：** 审查第N章 / 润色第N章（5种模式）/ 第N章写作简报——作者手写 + AI 辅助。
+- **所有 Python 辅助脚本（19 个）** 和 **所有 Prompt 文本与模板** 均为独立编写。
 
 ## 架构对比
 
@@ -42,10 +47,12 @@ Narrative Workbench 是一个受 InkOS 启发的独立 Markdown-native 实现。
 | **平台** | TypeScript CLI（npm 包） | Markdown prompt 框架（Claude Code/Codex CLI） |
 | **Agent 模型** | 10 Agent，3 阶段（创作→结算→质量） | 5 Agent，4 阶段流水线 + 独立上下文路由 |
 | **Agent 名称** | Radar、Planner、Composer、Architect、Writer、Observer、Reflector、Normalizer、Auditor、Reviser | Project Librarian、Writer、Polish、Review、Fixer |
-| **状态后端** | Markdown 真相文件 + SQLite + Zod schema 校验 | Markdown 账本 + JSON 镜像 + Python 脚本辅助 |
-| **Agent 会话** | 无状态（每章新调用） | 持久会话（Agent 跨章存活，主会话内复用） |
-| **上下文管理** | Composer Agent 按相关性选取上下文 | 持久会话基线 + Context Packet 替代规则 |
-| **流水线控制** | CLI 命令（`inkos write next`） | 主会话通过 CLAUDE.md 协议编排 |
+| **状态后端** | Markdown 真相文件 + SQLite + Zod schema 校验 | Markdown 账本 + JSON 镜像 + 19 个 Python 脚本 |
+| **Agent 会话** | 无状态（每章新调用） | 持久会话（跨章存活，8 章重置阈值） |
+| **上下文管理** | Composer Agent 按相关性选取上下文 | 持久会话基线 + context_builder + prompt_compiler |
+| **流水线控制** | CLI 命令（`inkos write next`） | 主会话编排 + gatekeeper 门禁 + CLAUDE.md 协议 |
+| **确定性检查** | 内嵌 TypeScript 逻辑 | 19 个独立 Python 脚本（无 Python 时 AI 手动等效） |
+| **写作模式** | 全自动流水线 | 流水线模式 + 共创模式（作者手写 + AI 辅助） |
 
 ## 许可证兼容性
 

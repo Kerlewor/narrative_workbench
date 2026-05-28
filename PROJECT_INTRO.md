@@ -13,7 +13,7 @@
 - Writer / Polish / Review / Fixer 职责混乱。
 - Claude Code subagent、Python 检查脚本、skills 扩展之间缺少统一接口。
 
-本框架的核心思想是：**主模型负责调度和判断，subagent 负责分工处理，Python 负责确定性检查，状态文件负责长期记忆。**
+本框架的核心思想是：**主模型负责调度和判断，subagent 负责分工处理，Python 负责确定性检查（19 个脚本），状态文件负责长期记忆。** v0.2.0 在 v0.1.0 基础上新增了上下文编译、确定性门禁、知识库索引、文风分析、角色漂移检测、文风拆解、共创模式辅助和 Python 环境降级方案。
 
 ## 2. 系统架构
 
@@ -22,16 +22,17 @@
   ↓
 主模型 / 主会话
   ├─ 读取 CLAUDE.md / RUN_RULES.md / system_protocol.md
+  ├─ 检测 Python 环境（有则用脚本，无则手动等效）
   ├─ 调用 Project Librarian 生成 Context Packet
-  ├─ 搭建大纲
-  ├─ 调度四 Agent
-  ├─ 运行 Python 辅助脚本
+  ├─ 搭建大纲 / 导入现成大纲 / 深化角色
+  ├─ 调度四 Agent（context_builder → prompt_compiler → Agent 执行）
+  ├─ 运行 gatekeeper 确定性门禁
   ├─ final-check
   └─ 提交 canonical 状态
         ↓
 Writer → Polish → Review → Fixer
         ↓
-story/runtime/ working 文件
+story/runtime/ working 文件（含 context / prompt / gatekeeper 产物）
         ↓
 chapters/ + story/*.md + story/state/*.json
 ```
@@ -57,15 +58,24 @@ chapters/ + story/*.md + story/state/*.json
 
 ### Python 职责
 
-Python 不参与创作判断，只做：
+19 个 Python 脚本不参与创作判断，只做确定性工作：
 
-- 文件完整性检查。
-- JSON 合法性检查。
-- 章节索引生成。
-- 文本格式和风险词扫描。
-- hook 半衰期和依赖检查。
-- 结构覆盖关系检查。
-- skill 注册表检查。
+- 文件完整性、JSON 合法性、frontmatter 格式检查（doctor.py）
+- 章节索引生成（chapter_index.py）
+- 项目状态概览与漂移风险（status.py）
+- 文本格式和风险词扫描（text_audit.py）
+- hook 半衰期和依赖检查（hook_report.py / hook_matrix.py）
+- 结构覆盖关系检查（structure_report.py）
+- skill 注册表检查（skill_check.py）
+- 按 Agent 构建上下文包（context_builder.py）
+- 三层 prompt 编译（prompt_compiler.py）
+- 确定性门禁检查（gatekeeper.py）
+- 知识库索引与查询（knowledge_index.py）
+- 定量文风报告（style_report.py）
+- 角色漂移预警（character_drift_report.py）
+- 文风拆解器（decompose_style.py）
+- InkOS 项目迁移（import_inkos_project.py）
+- 共创模式简报生成（review_author_chapter.py / polish_author_chapter.py）
 
 ## 3. 目录结构
 
@@ -143,15 +153,19 @@ python3 scripts/structure_report.py
 ```text
 project-librarian / Context Packet
   ↓
-主会话创建 intent + plan
+主会话: Python 环境检测 + drift check + intent + plan
   ↓
-novel-writer / Writer
+context_builder + prompt_compiler → 上下文包 + 编译 prompt
   ↓
-novel-polish / Polish
+novel-writer / Writer → 草稿
   ↓
-novel-review / Review
+novel-polish / Polish → 润色稿
   ↓
-novel-fixer / Fixer
+novel-review / Review → 审阅报告（含人格一致性检查）
+  ↓
+novel-fixer / Fixer → 修复稿
+  ↓
+gatekeeper → 确定性门禁（必须通过）
   ↓
 主会话 final-check
   ↓
@@ -201,10 +215,10 @@ agents/fixer.md
 
 Agent 和 skill 的输出只能进入：
 
-- `story/runtime/*.writer.md`
-- `story/runtime/*.polish.md`
-- `story/runtime/*.review.md`
-- `story/runtime/*.fixer.md`
+- `story/runtime/*.writer.md` / `.polish.md` / `.review.md` / `.fixer.md`
+- `story/runtime/*.intent.md` / `.plan.md`
+- `story/runtime/*.context.md` / `.prompt.md` / `.gatekeeper.md`
+- `story/runtime/*.knowledge_packet.md` / `.style_report.md` / `.character_drift.md`
 - `story/runtime/*.skill-*.md`
 - `story/runtime/*.final-check.md`
 
@@ -280,32 +294,18 @@ candidate → open → progressing → escalated → resolved / dormant / droppe
 
 - `RUN_RULES.md`
 
-脚本位于：
+脚本位于 `scripts/`，共 19 个，分为五组：
 
-```text
-scripts/doctor.py
-scripts/chapter_index.py
-scripts/text_audit.py
-scripts/hook_report.py
-scripts/hook_matrix.py
-scripts/structure_report.py
-scripts/skill_check.py
-```
+| 组 | 脚本 |
+|---|---|
+| 体检与索引 | `doctor.py` / `chapter_index.py` / `status.py` |
+| Hook 审计 | `hook_report.py` / `hook_matrix.py` |
+| 上下文与门禁 | `context_builder.py` / `prompt_compiler.py` / `gatekeeper.py` |
+| 文风与角色 | `style_report.py` / `character_drift_report.py` / `decompose_style.py` / `text_audit.py` |
+| 知识与迁移 | `knowledge_index.py` / `import_inkos_project.py` / `structure_report.py` / `skill_check.py` |
+| 共创辅助 | `review_author_chapter.py` / `polish_author_chapter.py` / `create_project.py` |
 
-常用命令：
-
-```bash
-python3 scripts/doctor.py
-python3 scripts/chapter_index.py --check
-python3 scripts/chapter_index.py --write
-python3 scripts/text_audit.py chapters/0001_标题.md
-python3 scripts/hook_report.py --current 12
-python3 scripts/hook_matrix.py --current 12
-python3 scripts/structure_report.py
-python3 scripts/skill_check.py
-```
-
-脚本只做确定性辅助，不做创作判断。
+脚本只做确定性辅助，不做创作判断。所有脚本不调用 AI 模型、不自动改写正文。
 
 ## 11. Skill 接口
 
@@ -375,10 +375,12 @@ Skill 不直接改 canonical 状态。
 
 ## 14. 剩余限制
 
-- 文笔上限仍然受模型能力限制。
-- 主会话仍需认真执行规则。
-- Python 不能替代语义判断。
-- 没有真正后台自动调度器，调度由主模型完成。
+- 文笔上限仍然受模型能力限制。框架通过负面清单和 Polish 层约束下限，但文学品质取决于底层模型。
+- 主会话仍需认真执行规则。gatekeeper 能堵住流程漏洞，但无法替代主会话的创作判断。
+- Python 脚本只做确定性检查，不做语义判断。gatekeeper 通过不代表章节合格。
+- 知识库第一版基于关键词和元数据，不支持语义检索。
+- 没有真正后台自动调度器，调度由主模型通过 CLAUDE.md 协议完成。
+- 无 Python 环境时需 AI 手动执行等效检查，可靠性略低于脚本。
 - 状态文件较多，适合中长篇，不适合极轻量任务。
 
 ## 15. 推荐工作方式
@@ -386,7 +388,7 @@ Skill 不直接改 canonical 状态。
 最推荐的实际使用节奏：
 
 ```text
-搭建大纲
+搭建大纲 / 导入现成大纲
   ↓
 doctor + structure_report
   ↓
@@ -394,24 +396,20 @@ doctor + structure_report
   ↓
 hook_report + hook_matrix
   ↓
-Writer
+context_builder + prompt_compiler（为 Agent 编译上下文和 prompt）
   ↓
-Polish
+Writer → Polish → Review → Fixer
   ↓
-Review
-  ↓
-Fixer
+gatekeeper（必须通过）
   ↓
 text_audit + final-check
   ↓
 写入 chapters
   ↓
-chapter_index --write
-  ↓
-doctor
+chapter_index --write + doctor
 ```
 
-批量写作时，每章仍然要按顺序提交 canonical 状态，不能先写完多章再统一补状态。
+批量写作时，每章仍然要按顺序提交 canonical 状态，不能先写完多章再统一补状态。共创模式下，作者手写章节后可通过 `审查第N章` 或 `润色第N章 --模式` 调用 AI 辅助。
 
 ## 16. Lineage & Attribution
 
