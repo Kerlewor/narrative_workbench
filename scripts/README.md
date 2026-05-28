@@ -123,6 +123,156 @@ python3 scripts/skill_check.py --skill skill-name
 - 检查入口文件路径是否存在。
 - 在用户要求使用某 skill 时，确认该 skill 已注册。
 
+## context_builder.py
+
+```bash
+python3 scripts/context_builder.py --chapter 12 --agent writer
+python3 scripts/context_builder.py --chapter 12 --agent review
+```
+
+用途：
+
+- 为每个 Agent 按章节构建上下文包，替代主模型手动判断该读哪些文件。
+- 5 种 Agent（writer/polish/review/fixer/librarian）各有独立的必读内容、压缩摘要和排除文件配置。
+- 内置 token 预算控制（Writer 18K / Polish 12K / Review 15K / Fixer 8K / Librarian 20K）。
+- 输出包含必读内容、压缩摘要、禁止泄露提示、输出契约、省略文件清单和预算摘要。
+- 产物路径：`story/runtime/chapter-XXXX.<agent>.context.md`
+
+## prompt_compiler.py
+
+```bash
+python3 scripts/prompt_compiler.py --chapter 12 --agent writer
+python3 scripts/prompt_compiler.py --chapter 12 --agent writer --context runtime/chapter-0012.writer.context.md
+```
+
+用途：
+
+- 三层 prompt 编译（Base Prompt + 项目规则 + 本章任务），使每次 Agent 输入可复现、可追溯。
+- Layer 1 从 `agents/<agent>.md` 读取角色定义；Layer 2 从项目规则文件编译；Layer 3 从 intent/plan/context 编译本章任务和半衰期风险提示。
+- 产物路径：`story/runtime/chapter-XXXX.<agent>.prompt.md`
+
+## gatekeeper.py
+
+```bash
+python3 scripts/gatekeeper.py --chapter 12 --stage final
+```
+
+用途：
+
+- final-check 前必须运行的确定性门禁检查。所有检查不依赖 AI 判断。
+- 检查流水线产物完整性（intent/plan/writer/polish/review/fixer 是否全部存在）。
+- 检查 Review→Fixer 响应覆盖（必修问题是否被逐条处理）。
+- 检查 hook 半衰期同步和禁止模式（括号内心独白、非标准引号）。
+- 输出 PASSED/FAILED + 阻塞问题（BLOCKING）+ 非阻塞警告（WARN）。
+- FAILED 时不得继续 final-check 或写入 canonical。
+- 产物路径：`story/runtime/chapter-XXXX.gatekeeper.md`
+
+## knowledge_index.py
+
+```bash
+python3 scripts/knowledge_index.py build
+python3 scripts/knowledge_index.py query --chapter 12 --agent writer
+python3 scripts/knowledge_index.py query --domain 中医方剂 --keyword 金疮药
+```
+
+用途：
+
+- 关键词+元数据项目索引，第一版不依赖向量数据库。
+- build 模式扫描项目文件（角色卡、大纲、章节、伏笔池），提取实体和文件元数据。
+- query 模式按章节/领域/关键词查询，生成 knowledge_packet。
+- 产物路径：`.nw_index/entity_index.json`、`story/runtime/chapter-XXXX.knowledge_packet.md`
+
+## status.py
+
+```bash
+python3 scripts/status.py
+python3 scripts/status.py --verbose
+```
+
+用途：
+
+- 项目状态概览：章节进度、活跃/已回收 hook 数、超半衰期 hook 数、角色漂移风险、脚本数量、知识库索引状态。
+- 根据检测结果给出建议下一步操作。
+- `--verbose` 额外输出 runtime 文件详情。
+
+## style_report.py
+
+```bash
+python3 scripts/style_report.py --chapter 12
+python3 scripts/style_report.py --input chapters/0012_标题.md
+```
+
+用途：
+
+- 定量文风报告：句长分布（短/中/长句比例）、对白密度、段落形态、AI 味模式命中次数。
+- 输出具体的改进建议。
+- 产物路径：`story/runtime/chapter-XXXX.style_report.md`
+
+## character_drift_report.py
+
+```bash
+python3 scripts/character_drift_report.py --chapter 12
+python3 scripts/character_drift_report.py --chapter 12 --character 林半夏
+```
+
+用途：
+
+- 读取角色卡的 `cannot_do` 和 `speech_style` 约束，扫描章节文本查找疑似违背。
+- 输出预警但不做最终判断——只标可疑点供 Review Agent 评估。
+- 产物路径：`story/runtime/chapter-XXXX.character_drift.md`
+
+## decompose_style.py
+
+```bash
+python3 scripts/decompose_style.py --input chapters/drafts/author-sample.md
+```
+
+用途：
+
+- 文风拆解器。输入文本 → 输出三个产物：
+  1. `style_analysis.md` — 人读的文风拆解报告（叙述视角、句法节奏、情绪表达、对白特点等）
+  2. `style_profile.json` — 系统读的结构化配置
+  3. `style_skill.md` — Agent 执行的风格规则
+
+## import_inkos_project.py
+
+```bash
+python3 scripts/import_inkos_project.py /path/to/inkos-book
+python3 scripts/import_inkos_project.py /path/to/inkos-book --dry-run
+```
+
+用途：
+
+- 将 InkOS 项目文件映射迁移到 Narrative Workbench。不内置 InkOS 源码或 prompt 文本。
+- 11 个文件映射规则（直接映射 + 需手动审核）。章节和角色卡批量迁移。
+- `--dry-run` 预览模式。
+
+## review_author_chapter.py
+
+```bash
+python3 scripts/review_author_chapter.py --chapter 12
+python3 scripts/review_author_chapter.py --input chapters/drafts/my-chapter.md
+```
+
+用途：
+
+- 共创模式：为作者手写章节生成审查简报。
+- 脚本生成结构化任务包，不调用 AI 模型、不自动改写正文。真正的审查由 Claude Code/Codex 的 Review Agent 完成。
+- 产物路径：`story/runtime/chapter-XXXX.author_review_brief.md`
+
+## polish_author_chapter.py
+
+```bash
+python3 scripts/polish_author_chapter.py --chapter 12 --mode light
+python3 scripts/polish_author_chapter.py --chapter 12 --mode anti-ai
+```
+
+用途：
+
+- 共创模式：为作者手写章节生成润色简报。5 种润色模式各有独立指令集。
+- 脚本生成结构化任务包，不调用 AI 模型、不自动改写正文。真正的润色由 Claude Code/Codex 的 Polish Agent 完成。
+- 产物路径：`story/runtime/chapter-XXXX.author_polish_<mode>.md`
+
 ## 边界
 
-这些脚本只做确定性辅助，不做创作判断。不要用脚本自动总结章节、自动回收 hook、自动润色正文或自动调度 Agent。
+这些脚本只做确定性辅助，不做创作判断。不要用脚本自动总结章节、自动回收 hook、自动润色正文或自动调度 Agent。审查和润色脚本生成的是结构化任务包，不调用 AI 模型。

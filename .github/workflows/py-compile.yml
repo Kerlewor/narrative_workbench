@@ -32,4 +32,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: python scripts/gatekeeper.py --chapter 1 --stage final || true
+      - name: Smoke test gatekeeper
+        run: |
+          python scripts/gatekeeper.py --chapter 1 --stage final > gatekeeper.log 2>&1 || true
+          cat gatekeeper.log
+          # Fail CI on real errors (traceback, syntax), but not on business-level FAILED
+          if grep -q "Traceback\|SyntaxError\|ModuleNotFoundError\|ImportError" gatekeeper.log; then
+            echo "FATAL: gatekeeper crashed with an exception"
+            exit 1
+          fi
+          echo "OK: gatekeeper ran without exceptions (business-level result may be PASSED or FAILED)"
