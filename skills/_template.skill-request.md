@@ -19,6 +19,15 @@ status: requested|completed|adopted|rejected
 
 -
 
+## 知识库查询
+
+> 如果 Skill 依赖知识库领域事实，在此声明查询参数。
+
+- 是否查询知识库：是 / 否
+- 查询领域：
+- 查询关键词：
+- 查询结果引用：
+
 ## Skill 输出位置
 
 -

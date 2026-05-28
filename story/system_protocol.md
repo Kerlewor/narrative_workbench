@@ -46,6 +46,9 @@
 - `story/runtime/batch-*.plan.md`
 - `story/runtime/batch-*.audit.md`
 - `story/runtime/session-*-context.md`
+- `story/runtime/chapter-*.context.md`
+- `story/runtime/chapter-*.prompt.md`
+- `story/runtime/chapter-*.gatekeeper.md`
 - `story/runtime/*.skill-*.md`
 
 Agent 只能输出到 working 区。canonical 区由主会话统一提交。

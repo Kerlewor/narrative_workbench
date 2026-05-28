@@ -56,8 +56,11 @@ def find_runtime_file(stage: str, chapter: int) -> Optional[Path]:
     candidate = ROOT / "story/runtime" / f"{prefix}.{stage}.md"
     if candidate.is_file():
         return candidate
-    glob_pattern = f"{prefix}.*{stage}*.md"
-    matches = sorted((ROOT / "story/runtime").glob(glob_pattern))
+    glob_pattern = f"{prefix}.{stage}*.md"
+    matches = sorted(
+        p for p in (ROOT / "story/runtime").glob(glob_pattern)
+        if not p.name.endswith((".context.md", ".prompt.md", ".gatekeeper.md"))
+    )
     return matches[0] if matches else None
 
 

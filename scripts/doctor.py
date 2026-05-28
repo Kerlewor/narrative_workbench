@@ -22,6 +22,7 @@ REQUIRED_FILES = [
     "PROJECT_INTRO.md",
     "scripts/create_project.py",
     "scripts/context_builder.py",
+    "scripts/prompt_compiler.py",
     "scripts/gatekeeper.py",
     "skills/skill_protocol.md",
     "skills/skill_registry.md",

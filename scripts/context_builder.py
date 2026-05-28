@@ -99,8 +99,12 @@ def find_runtime_file(pattern: str, chapter: int) -> Optional[Path]:
     candidate = ROOT / "story/runtime" / f"{prefix}.{pattern}.md"
     if candidate.is_file():
         return candidate
-    glob_pattern = f"{prefix}.*{pattern}*.md"
-    matches = sorted((ROOT / "story/runtime").glob(glob_pattern))
+    # Broader glob for files like "chapter-0001.scene-1.md"
+    glob_pattern = f"{prefix}.{pattern}*.md"
+    matches = sorted(
+        p for p in (ROOT / "story/runtime").glob(glob_pattern)
+        if not p.name.endswith((".context.md", ".prompt.md", ".gatekeeper.md"))
+    )
     if matches:
         return matches[0]
     return None

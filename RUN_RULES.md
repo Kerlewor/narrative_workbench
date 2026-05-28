@@ -19,10 +19,10 @@
 | 注册或修改 skill 后 | `python3 scripts/skill_check.py`、`python3 scripts/doctor.py` | skill request 或修改说明 |
 | 规划第 N 章前 | `python3 scripts/hook_report.py --current N-1`、`python3 scripts/hook_matrix.py --current N-1` | `chapter-000N.intent.md` 的 Hook 预算 |
 | 批量规划前 | `python3 scripts/doctor.py`、`python3 scripts/hook_report.py --current N-1`、`python3 scripts/hook_matrix.py --current N-1`、`python3 scripts/structure_report.py` | `batch-000N-000M.plan.md` |
-| Writer 前 | 建议 `python3 scripts/context_builder.py --chapter N --agent writer`；必须读取 intent / plan / hook_protocol | `chapter-000N.writer.md` handoff |
-| Polish 前 | 建议 `python3 scripts/context_builder.py --chapter N --agent polish`；必须读取 style_profile / style_guide | `chapter-000N.polish.md` handoff |
-| Review 前 | 建议 `python3 scripts/context_builder.py --chapter N --agent review`；若已有候选正文文件，运行 `python3 scripts/text_audit.py <候选正文路径>` | `chapter-000N.review.md` |
-| Fixer 前 | 建议 `python3 scripts/context_builder.py --chapter N --agent fixer` | `chapter-000N.fixer.md` handoff |
+| Writer 前 | 建议 `python3 scripts/context_builder.py --chapter N --agent writer` + `python3 scripts/prompt_compiler.py --chapter N --agent writer`；必须读取 intent / plan / hook_protocol | `chapter-000N.writer.md` handoff |
+| Polish 前 | 建议 `python3 scripts/context_builder.py --chapter N --agent polish` + `python3 scripts/prompt_compiler.py --chapter N --agent polish`；必须读取 style_profile / style_guide | `chapter-000N.polish.md` handoff |
+| Review 前 | 建议 `python3 scripts/context_builder.py --chapter N --agent review` + `python3 scripts/prompt_compiler.py --chapter N --agent review`；若已有候选正文文件，运行 `python3 scripts/text_audit.py <候选正文路径>` | `chapter-000N.review.md` |
+| Fixer 前 | 建议 `python3 scripts/context_builder.py --chapter N --agent fixer` + `python3 scripts/prompt_compiler.py --chapter N --agent fixer` | `chapter-000N.fixer.md` handoff |
 | Final-check 前 | **必须** `python3 scripts/gatekeeper.py --chapter N --stage final`；`python3 scripts/text_audit.py chapters/000N_标题.md` 或候选稿路径；`python3 scripts/hook_report.py --current N`；`python3 scripts/hook_matrix.py --current N` | `chapter-000N.final-check.md` |
 | 正文写入后 | `python3 scripts/chapter_index.py --write`、`python3 scripts/doctor.py` | `chapter-000N.final-check.md` |
 | 批末审计 | `python3 scripts/doctor.py`、`python3 scripts/chapter_index.py --check`、`python3 scripts/hook_report.py --current M`、`python3 scripts/hook_matrix.py --current M`、`python3 scripts/structure_report.py` | `batch-000N-000M.audit.md` |
@@ -42,6 +42,7 @@
 | `structure_report.py` | 章节、摘要、弧光、runtime、索引覆盖关系 | 判断故事结构是否精彩 |
 | `skill_check.py` | skill 注册表、状态、入口文件检查 | 判断 skill 输出质量 |
 | `context_builder.py` | 按 Agent 类型和章节构建上下文包，控制 token 预算 | 替代主模型判断哪些文件该读 |
+| `prompt_compiler.py` | 按三层结构编译 Agent prompt（Base + 项目规则 + 本章任务） | 替代主模型手动拼接 prompt |
 | `gatekeeper.py` | 检查流水线产物完整性、Review→Fixer 响应覆盖、hook 同步、禁止模式 | 替代主模型做创造性判断 |
 
 ## 失败处理
@@ -55,6 +56,14 @@
 - hook 表头不符合协议。
 - runtime 状态非法。
 - Claude Code agent frontmatter 错误。
+
+### gatekeeper.py 阻塞
+
+gatekeeper 报 FAILED 时，**不得继续 final-check 或写入 canonical**。必须：
+
+- 逐条修复 BLOCKING 问题（缺少的产物补上，未响应的 Review 项交给 Fixer 处理，到期的 hook 在正文中推进或正式 defer/dormant）。
+- 修复后重新运行 gatekeeper，直到 PASSED。
+- WARN 项不阻塞，但必须记录到 final-check 中。
 
 ### hook_report.py / hook_matrix.py 警告
 
