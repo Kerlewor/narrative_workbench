@@ -134,6 +134,62 @@ skill 输出进入 story/runtime/chapter-000N.skill-SKILLNAME.md
 | `dialogue-only` / `dialogue` | 只修对白，让角色声音与角色卡的对白风味对齐 |
 | `rhythm-only` / `rhythm` | 只调节奏：段落长短、高压喘息比例、章尾落点 |
 
+## Python 辅助脚本
+
+### 环境检测
+
+每次会话启动时，AI 会首先询问你的 Python 环境状态。两种模式功能完整：
+
+| 模式 | 说明 |
+|---|---|
+| **有 Python 3 环境** | 19 个脚本负责文件完整性、JSON 合法性、hook 半衰期、文本审计等确定性检查，AI 负责创作判断 |
+| **无 Python 或不使用** | AI 手动执行等效检查（逐项验证文件、计算半衰期、扫描禁止模式等），产物标注 `(manual)`，功能完整但可靠性略低于脚本 |
+
+### 脚本分类
+
+19 个 Python 脚本按功能分为五组：
+
+| 类别 | 脚本 | 说明 |
+|---|---|---|
+| **体检与索引** | `doctor.py` / `chapter_index.py` / `status.py` | 项目健康检查、章节索引生成、项目状态概览 |
+| **Hook 审计** | `hook_report.py` / `hook_matrix.py` | 活跃 hook 预算、半衰期到期、依赖环检测 |
+| **上下文与门禁** | `context_builder.py` / `prompt_compiler.py` / `gatekeeper.py` | 按 Agent 构建上下文包、三层 prompt 编译、确定性门禁检查 |
+| **文风与角色** | `style_report.py` / `character_drift_report.py` / `decompose_style.py` / `text_audit.py` | 句长/对白密度分析、角色漂移预警、文风拆解、文本审计 |
+| **知识与迁移** | `knowledge_index.py` / `import_inkos_project.py` / `structure_report.py` / `skill_check.py` | 项目知识索引、InkOS 项目迁移、结构覆盖检查、Skill 注册校验 |
+| **共创辅助** | `review_author_chapter.py` / `polish_author_chapter.py` / `create_project.py` | 手写稿审查简报、手写稿润色简报、新项目创建 |
+
+运行门禁见 `RUN_RULES.md`。详细说明见 [`scripts/README.md`](scripts/README.md)。
+
+## 知识库系统
+
+知识库用于储存小说所需的专业领域知识——医学考据、古代官制、武术流派、历史细节等。这些内容不属于"本书设定"而属于"现实世界知识"，不适合塞进角色卡或世界观铁律。
+
+### 构建索引
+
+```bash
+python3 scripts/knowledge_index.py build
+```
+
+扫描项目文件（角色卡、大纲、章节、伏笔池），提取实体和文件元数据，生成 `.nw_index/entity_index.json`。
+
+### 查询与生成知识包
+
+按章节生成知识包（供 context_builder 和 prompt_compiler 使用）：
+
+```bash
+python3 scripts/knowledge_index.py query --chapter 12 --agent writer
+```
+
+按领域和关键词查询：
+
+```bash
+python3 scripts/knowledge_index.py query --domain 中医方剂 --keyword 金疮药
+```
+
+### 知识库与 Skill 的关系
+
+知识库是领域事实的单一权威来源。Skill 是纯方法论层——它描述"怎么检查"但不拥有"用来检查的事实"。Skill 运行时通过 `knowledge_index.py --query` 获取相关事实，校验报告的每条建议都引用知识库条目编号。设计原则：**知识库是图书馆，Skill 是研究员。研究员可以查资料，但不能自己编资料。**
+
 ## 目录结构
 
 ```text
@@ -154,17 +210,9 @@ scripts/           19 个 Python 确定性辅助脚本
 chapters/          正文章节（000N_标题.md）
 ```
 
-## Python 辅助脚本
-
-19 个脚本覆盖上下文工程、流程确定性、知识库索引、文风分析、角色漂移检测、文风拆解、共创模式辅助和 InkOS 项目迁移。运行门禁见 `RUN_RULES.md`。详细说明见 [`scripts/README.md`](scripts/README.md)。
-
-核心脚本：`doctor.py` · `context_builder.py` · `prompt_compiler.py` · `gatekeeper.py` · `knowledge_index.py` · `status.py` · `style_report.py` · `character_drift_report.py` · `decompose_style.py` · `chapter_index.py` · `text_audit.py` · `hook_report.py` · `hook_matrix.py` · `structure_report.py`
-
-脚本只做确定性检查，不做创作判断。
-
 ## 使用示例
 
-以下是从零搭建一本架空历史小说的实例过程。用户为 AI 提供初始构思，其余由 AI 按工作流协议推进。
+### 从零搭建到持续创作
 
 ```text
 用户: 搭建大纲
@@ -175,59 +223,108 @@ AI:   好的。先确认基础定位——
 用户: 南宋绍兴年间，一个精通医术的女子为躲避金兵追杀，
       伪装身份混入太医院，却卷入了宫廷内部的权力斗争。
 
-AI:   主类型是历史架空，副类型有悬疑和权谋，对吗？
-      在开始之前，我想先确认主角——
-      这个角色最想要什么？最害怕什么？
-
-      [... 经过五阶段大纲搭建，产出 story_frame.md、
+AI:   [... 五阶段大纲搭建完成，产出 story_frame.md、
        volume_map.md、book_rules.md、角色卡、character_matrix.md]
 
 用户: 深化角色 林半夏
 
-AI:   好的。当前角色卡中林半夏只有基础标签"冷静、医术高超"。
-      让我们进入 Round 1（核心人格）——
-      你说她冷静，那她在什么情境下会失控？有没有一个
-      让她破防的开关？
-
-      [... 四轮讨论完成，角色卡补全 Personality Lock、
+AI:   [四轮讨论完成，角色卡补全 Personality Lock、
        压力测试结论、对白风味和动作锚点]
 
 用户: 写第1章
 
 AI:   [drift check] → [创建 intent/plan] →
       [Writer] 草稿 → [Polish] 润色 → [Review] 审阅 → [Fixer] 修复 →
-      [final-check 通过] → 写入 chapters/0001_临安雪.md → 同步状态
+      [gatekeeper 通过] → [final-check 通过] → chapters/0001_临安雪.md
 
-用户: 继续下一章
-
-AI:   [自动确定 N=2] → [复用持久 Agent 会话，无需重发基线] →
-      Writer → Polish → Review → Fixer → final-check →
-      chapters/0002_药引.md
-
-用户: 写接下来5章
-
-AI:   [批前 hook_report + drift check + batch-plan] →
-      Ch3~Ch7 流水线重叠执行 →
-      批末 batch-audit → doctor 体检通过
-
-      第 1 卷还差 5 章达到卷尾节点，要继续吗？
-
-用户: 继续
-
-AI:   [新一轮 batch-plan，自动延续上一批的 hook 状态] →
-      Ch8~Ch12 → 卷尾不可逆事件达成 →
-      structure_report 确认第 1 卷结构闭环 →
-      第 1 卷完成。是否进入第 2 卷？
-
-用户: 继续
-
-AI:   [进入新卷前：doctor + structure_report + hook_matrix 全量检查] →
-      [上一卷 runtime 归档至 volume-1/] →
-      创建第 2 卷首章 intent/plan →
-      开始 Ch13...
+用户: 继续下一章          # 复用持久 Agent，无需重发基线
+用户: 写接下来5章         # 流水线重叠，批末 audit
+用户: 继续                # 跨卷自动归档 → 第 2 卷...
 ```
 
-框架处理了：大纲搭建的结构化推进、角色设计的追问深度、Agent 的持久会话复用和流水线重叠、hook 的半衰期追踪、批量续写与卷间切换的完整闭环。
+### 注册并使用 Skill
+
+```text
+用户: 我想注册一个"宋代官制审查"skill，
+      用来检查小说中的官职描写是否准确。
+
+AI:   好的。请简单描述这个 skill 的检查逻辑和触发条件。
+
+用户: 当章节涉及官员出场时触发。检查官职名是否属于南宋、
+      品级与权力是否匹配、官员称谓是否合理。
+
+AI:   [登记到 skills/skill_registry.md] →
+      [运行 skill_check.py 验证] → 注册完成
+
+      Skill "song-dynasty-official-review" 已注册（状态: enabled）。
+      后续章节中如果涉及官员出场，我会自动调用该 skill 进行审查。
+      你也可以随时说"调用 song-dynasty-official-review 检查第 3 章"。
+```
+
+### 共创模式：手写章节后调 AI 审与修
+
+```text
+用户: 审查第 5 章
+      # 用户手写了 Ch5，想让 AI 审查但不改原文
+
+AI:   [读取 chapters/drafts/chapter-0005.author.md] →
+      [Review 审查完成，输出问题清单] →
+      发现 3 个问题：林半夏在第 3 场对陌生人透露了身份（角色约束违反）；
+      H017 到期未推进；章尾使用了抽象情绪总结句。
+      是否要逐条处理？
+
+用户: 润色第 5 章 --模式 anti-ai
+
+AI:   [Polish 按 anti-ai-only 模式处理] →
+      删除了 4 处"某种难以言说的"、2 处"不是……而是……"，
+      将章尾总结句改为物件落点。改动已标注位置和原因。
+      原稿未覆盖，润色稿在 story/runtime/chapter-0005.author_polish_anti-ai.md。
+```
+
+### 构建知识库并用于写作
+
+```text
+用户: 我在 story/knowledge/ 下放了南宋太医院职官、
+      《太平惠民和剂局方》摘要和宋代都城布局三份考据资料。
+      帮我建索引。
+
+AI:   [knowledge_index.py build] →
+      索引完成：扫描到 3 个知识领域、47 条实体记录。
+      已生成 .nw_index/entity_index.json。
+
+用户: 写第 3 章     # 本章涉及太医院内部场景
+
+AI:   [context_builder --chapter 3 --agent writer] →
+      [knowledge_index query --chapter 3 --agent writer] →
+      上下文包已注入：太医院职官体系（KB:F001-F012）、
+      宋代方剂知识（KB:F030-F045）。
+      Writer 在写作时可引用这些参考，确保医学描写准确。
+```
+
+### 文风拆解
+
+```text
+用户: 分析我手写的那章文风
+
+AI:   [decompose_style.py --input chapters/drafts/chapter-0001.author.md] →
+      生成三个文件：
+      - style_analysis.md：第三人称限知，短中句为主，情绪通过动作呈现...
+      - style_profile.json：{"pov": "third_person_limited", ...}
+      - style_skill.md：Prefer 用动作承载情绪；Avoid 直接总结人物心理...
+
+      是否将 style_skill.md 注册为项目 Skill？
+      这样后续 AI 辅助时会自动对齐你的文风。
+```
+
+## 已知问题与限制
+
+- **文笔上限受模型能力限制。** 框架通过 style_blacklist、scene-beat 和 Polish 层约束文笔下限，但文学品质仍取决于底层模型。
+- **Python 脚本只做确定性检查，不做语义判断。** gatekeeper 通过不代表章节质量合格——只代表流程完整。创作质量的最终判断权在主会话和作者。
+- **知识库第一版基于关键词和元数据，不支持语义检索。** 精确匹配可能漏掉相关但措辞不同的内容。后续版本可考虑引入 embedding 检索。
+- **长篇项目状态文件随章节数线性增长。** `chapter_summaries.md` 和 `emotional_arcs.md` 已支持按卷分段，但数百章后仍需人工管理。
+- **共创模式的手写稿路径约定为 `chapters/drafts/`，** 该目录需用户自行创建。AI 不会自动创建此目录。
+- **InkOS 迁移器仅处理文件级映射。** SQLite memory.db、Zod JSON delta 和 `particle_ledger.md` 等 InkOS 特有组件无法自动迁移，会标记为"需手动审核"。
+- **目前没有 Web UI 或后台自动调度器。** 调度完全由主会话通过 CLAUDE.md 协议完成，适合交互式使用但不适合无人值守的批量生成。
 
 ## 深入阅读
 
