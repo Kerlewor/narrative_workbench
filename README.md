@@ -29,7 +29,7 @@
 - **完整状态机：** 10 状态章节生命周期，含 `needs-rewrite` 和 `needs-repair` 显式失败回路。
 - **Hook 伏笔系统：** open / advance / escalate / resolve / defer 全生命周期 + 半衰期防遗忘 + 活跃预算控制。
 - **去 AI 味管线：** style_blacklist 负面清单 + scene-beat 场景拆解 + Polish 润色层。
-- **Skill 可插拔扩展 + Python 辅助体检：** 注册制 skill 系统 + 8 个确定性检查脚本。
+- **Skill 可插拔扩展 + Python 辅助体检：** 注册制 skill 系统 + 19 个确定性检查脚本（上下文工程、流程门禁、知识索引、文风分析、漂移检测、文风拆解、项目迁移）。
 
 ## 快速开始
 
@@ -150,15 +150,17 @@ story/
   style_samples/   用户风格样本
   *.md             状态账本与风格规则（18 个文件）
 skills/            可插拔 skill 接口与注册表
-scripts/           8 个 Python 辅助脚本
+scripts/           19 个 Python 确定性辅助脚本
 chapters/          正文章节（000N_标题.md）
 ```
 
 ## Python 辅助脚本
 
-`doctor.py` · `create_project.py` · `chapter_index.py` · `text_audit.py` · `hook_report.py` · `hook_matrix.py` · `structure_report.py` · `skill_check.py`
+19 个脚本覆盖上下文工程、流程确定性、知识库索引、文风分析、角色漂移检测、文风拆解、共创模式辅助和 InkOS 项目迁移。运行门禁见 `RUN_RULES.md`。详细说明见 [`scripts/README.md`](scripts/README.md)。
 
-脚本只做确定性检查，不做创作判断。运行门禁见 `RUN_RULES.md`。详细说明见 [`scripts/README.md`](scripts/README.md)。
+核心脚本：`doctor.py` · `context_builder.py` · `prompt_compiler.py` · `gatekeeper.py` · `knowledge_index.py` · `status.py` · `style_report.py` · `character_drift_report.py` · `decompose_style.py` · `chapter_index.py` · `text_audit.py` · `hook_report.py` · `hook_matrix.py` · `structure_report.py`
+
+脚本只做确定性检查，不做创作判断。
 
 ## 使用示例
 

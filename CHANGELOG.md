@@ -43,7 +43,7 @@
 - **START_HERE.md** — 命令列表和脚本列表同步更新
 - **system_protocol.md** — Working 区新增 3 种 runtime 文件类型
 - **README.md** — 新增共创模式章节；用户命令表新增 3 个命令
-- **doctor.py** — 检查范围覆盖全部 18 个脚本和 6 种新 runtime 文件类型
+- **doctor.py** — 检查范围覆盖全部 19 个脚本和 6 种新 runtime 文件类型
 
 ### 设计决策
 

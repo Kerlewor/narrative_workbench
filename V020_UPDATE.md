@@ -133,10 +133,10 @@ v0.2.0 在"AI 全流程写作"之外新增了"作者手写 + AI 辅助"的共创
 
 - **CLAUDE.md** — 恢复丢失的 `## Agent 职责` 标题；final-check 增加 gatekeeper 前置检查；Agent 恢复增加 context_builder 建议；新增 3 个共创模式命令 + 深化角色命令；信息流向原则明确化
 - **RUN_RULES.md** — 阶段门禁表新增 7 行（context_builder 4 行、prompt_compiler 1 行、gatekeeper 1 行、Final-check 更新 1 行）；脚本职责表新增 3 行；gatekeeper 失败处理规则
-- **START_HERE.md** — 命令列表增加 4 个新命令；脚本列表增加 3 个新脚本
+- **START_HERE.md** — 命令列表增加 4 个新命令；脚本列表和 Python 环境检测同步更新
 - **system_protocol.md** — Working 区新增 3 种 runtime 文件类型；定稿门禁扩展为 9 项
 - **README.md** — 用户命令表新增 3 个共创模式命令
-- **doctor.py** — 检查范围覆盖 3 个新脚本和 3 种新 runtime 文件类型
+- **doctor.py** — 检查范围覆盖全部 19 个脚本和 6 种新 runtime 文件类型
 
 ## 脚本总数
 

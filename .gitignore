@@ -11,3 +11,6 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Generated runtime artifacts (not for version control)
+.nw_index/

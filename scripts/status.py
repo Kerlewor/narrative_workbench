@@ -115,7 +115,8 @@ def main() -> int:
     else:
         print(f"  角色漂移风险: 无")
 
-    print(f"  脚本: 11 个 Python 辅助脚本可用")
+    scripts_count = len(list((ROOT / "scripts").glob("*.py")))
+    print(f"  脚本: {scripts_count} 个 Python 辅助脚本可用")
     print(f"  知识库索引: {'已构建' if (ROOT / '.nw_index/entity_index.json').is_file() else '未构建'}")
 
     print()
