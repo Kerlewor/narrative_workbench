@@ -354,9 +354,28 @@ AI:   [decompose_style.py --input chapters/drafts/chapter-0001.author.md] →
 - **InkOS 迁移器仅处理文件级映射。** SQLite memory.db、Zod JSON delta 和 `particle_ledger.md` 等 InkOS 特有组件无法自动迁移，会标记为"需手动审核"。
 - **目前没有 Web UI 或后台自动调度器。** 调度完全由主会话通过 CLAUDE.md 协议完成，适合交互式使用但不适合无人值守的批量生成。
 
+## 更新计划
+
+当前版本：**v0.2.0**（全面运行时升级）。下一个大版本 **v0.3.0** 将聚焦 Context Engine 重构与平台原生化，后续 **v0.4.0** 将交付 Markdown-native 作者工作台体验。
+
+详细路线图见 **[ROADMAP.md](ROADMAP.md)**（约 600 行，涵盖核心诊断、版本路线、难度评估、产品定位与实现方案）。
+
+### 版本概览
+
+| 版本 | 主题 | 核心交付 |
+|---|---|---|
+| **v0.2.2** | 正确性修复 | prompt_compiler bug 修复、Context Builder 精准筛选、5000 字符截断修复、DASHBOARD.md 自动生成 |
+| **v0.3** | 平台原生化 + Context Engine | CLAUDE.md 精简/AGENTS.md 新增、结构化账本（JSONL+Views）、Relevance Resolver、Skills 同步、章节导演表+接力卡 |
+| **v0.4** | 作者体验增强 | 伏笔看板、段落级 diff、章节双循环工作流、角色声音实验室、版本管理、文笔拆解 |
+
+### 产品定位
+
+Narrative Workbench 将保持为**运行在 Claude Code 与 Codex 之上的平台原生小说工作流包**，而非独立应用。Claude Code 和 Codex 已是交互界面——项目负责记忆、检索、审查、约束和版本管理，平台负责交互。详见 [ROADMAP.md §八](ROADMAP.md)。
+
 ## 深入阅读
 
 - [CLAUDE.md](CLAUDE.md) — 完整工作流协议与 Agent 架构
+- [ROADMAP.md](ROADMAP.md) — v0.3.0+ 详细改进路线图（核心诊断、版本路线、难度评估、实现方案）
 - [PROJECT_INTRO.md](PROJECT_INTRO.md) — 系统设计理念与组件说明
 - [ORIGIN.md](ORIGIN.md) — InkOS lineage、借鉴清单、独立构建内容、架构对比
 - [story/system_protocol.md](story/system_protocol.md) — 系统边界、状态机、反馈回路、定稿门禁
