@@ -356,7 +356,7 @@ AI:   [decompose_style.py --input chapters/drafts/chapter-0001.author.md] →
 
 ## 更新计划
 
-当前版本：**v0.2.0**（全面运行时升级）。下一个大版本 **v0.3.0** 将聚焦 Context Engine 重构与平台原生化，后续 **v0.4.0** 将交付 Markdown-native 作者工作台体验。
+当前版本：**v0.2.1**。v0.2.0 为全面运行时升级。下一个大版本 **v0.3.0** 将聚焦 Context Engine 重构与平台原生化，后续 **v0.4.0** 将交付 Markdown-native 作者工作台体验。
 
 详细路线图见 **[ROADMAP.md](ROADMAP.md)**（约 600 行，涵盖核心诊断、版本路线、难度评估、产品定位与实现方案）。
 
