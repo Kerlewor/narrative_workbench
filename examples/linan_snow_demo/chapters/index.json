@@ -1,0 +1,14 @@
+{
+  "chapters": [
+    {"chapter": 1, "title": "临安雪", "file": "chapters/drafts/chapter-0001.author.md", "status": "drafted", "wordCount": 1500},
+    {"chapter": 2, "title": "入城", "file": "chapters/drafts/chapter-0002.author.md", "status": "drafted", "wordCount": 1500}
+  ],
+  "schema": {
+    "chapter": "number",
+    "title": "string",
+    "file": "string",
+    "status": "string",
+    "wordCount": "number",
+    "updatedAt": "string"
+  }
+}

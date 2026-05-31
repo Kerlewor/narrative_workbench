@@ -1,0 +1,31 @@
+{
+  "hooks": [
+    {
+      "hookId": "H001",
+      "name": "弟弟的下落线索",
+      "type": "后台-真相",
+      "status": "progressing",
+      "priority": "core",
+      "startChapter": 1,
+      "lastAdvancedChapter": 1,
+      "expectedResolution": "弟弟的下落线索",
+      "resolutionVolume": 1,
+      "halfLife": 6,
+      "upgradeCondition": "推进到发现线索时升级为 escalated",
+      "evidence": "Ch1: 老僧提到太医院近期招募民间医士"
+    },
+    {
+      "hookId": "H002",
+      "name": "老僧的真实身份",
+      "type": "情感-关系",
+      "status": "open",
+      "priority": "high",
+      "startChapter": 1,
+      "lastAdvancedChapter": 1,
+      "expectedResolution": "老僧的真实身份揭示",
+      "resolutionVolume": 1,
+      "halfLife": 3,
+      "evidence": "Ch1: 老僧对金兵态度异常平静"
+    }
+  ]
+}

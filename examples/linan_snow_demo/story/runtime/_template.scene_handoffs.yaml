@@ -1,0 +1,47 @@
+# Scene Handoff Cards — 场景接力卡
+# 每写完一个场景后自动生成，是防止前后场景断裂的关键文件。
+#
+# 使用方式:
+#   1. 写完 scene_N 后，生成 scene_N 的接力卡
+#   2. 写 scene_N+1 前，Writer 必须读取 scene_N 的接力卡
+#   3. 接力卡由写作流程自动生成（可通过脚本或主会话手工填写）
+#
+# 生成位置: story/runtime/chapter_NNNN_scene_handoffs.yaml
+
+handoffs:
+  scene_01:
+    scene_id: scene_01
+    handoff_to: scene_02
+
+    # 物理状态（下一场必须继承）
+    physical_state:
+      location: ""
+      time: ""
+      items:
+        # character_id: "手持物品"
+        # character_id: "手持物品"
+
+    # 情绪状态（下一场必须继承，不可重置）
+    emotional_state:
+      # character_id: "情绪描述，包含程度和方向"
+
+    # 已揭示信息（下一场不可重复"首次揭示"）
+    revealed_information:
+      - ""
+
+    # 未解决冲突（下一场必须携带的张力）
+    unresolved_tension:
+      - ""
+
+    # 下一场景必须的输入（required-next-scene-input）
+    required_next_scene_input:
+      - ""
+
+    # 下一场景禁止在本场解决（do-not-resolve-in-this-scene）
+    do_not_resolve_in_this_scene:
+      - ""
+
+  # scene_02:
+  #   scene_id: scene_02
+  #   handoff_to: scene_03
+  #   ...

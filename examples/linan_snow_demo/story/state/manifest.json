@@ -1,0 +1,27 @@
+{
+  "version": "0.3.0",
+  "project": "linan_snow_demo",
+  "currentChapter": 2,
+  "sourceOfTruth": "chapters/",
+  "canonicalOwner": "main-session",
+  "syncContract": "story/state_contract.md",
+  "stateFiles": [
+    "story/state/current_state.json",
+    "story/state/chapter_summaries.json",
+    "story/state/hooks.json"
+  ],
+  "runtimeStatuses": [
+    "planned",
+    "drafted",
+    "polished",
+    "reviewed",
+    "fixed",
+    "final-check",
+    "final-aligned",
+    "superseded",
+    "needs-repair",
+    "needs-rewrite",
+    "audited",
+    "context-packed"
+  ]
+}

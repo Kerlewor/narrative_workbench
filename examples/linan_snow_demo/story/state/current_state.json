@@ -1,0 +1,9 @@
+{
+  "currentChapter": 1,
+  "currentLocation": "临安城外，废弃药王庙",
+  "protagonistState": "伪装为游方郎中，刚躲过金兵搜查",
+  "currentGoal": "混入太医院，寻找失散的弟弟林白术",
+  "activeHooks": ["H001"],
+  "resolvedHooks": [],
+  "lastUpdated": "2026-05-31"
+}
