@@ -2,7 +2,7 @@
 """Audit a chapter text for formatting and style-risk signals.
 
 Usage:
-    python3 scripts/text_audit.py chapters/0001_title.md
+    python scripts/text_audit.py chapters/0001_title.md
 """
 
 from __future__ import annotations

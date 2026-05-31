@@ -6,8 +6,8 @@ This is NOT an AI review — it checks file existence, pipeline completeness,
 Review→Fixer response coverage, hook synchronization, and forbidden patterns.
 
 Usage:
-    python3 scripts/gatekeeper.py --chapter 12 --stage final
-    python3 scripts/gatekeeper.py --chapter 12 --stage fixer
+    python scripts/gatekeeper.py --chapter 12 --stage final
+    python scripts/gatekeeper.py --chapter 12 --stage fixer
 
 Output:
     story/runtime/chapter-0012.gatekeeper.md

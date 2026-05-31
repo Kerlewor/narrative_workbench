@@ -2,8 +2,8 @@
 """Create a new novel project from Narrative Workbench.
 
 Usage:
-    python3 scripts/create_project.py "我的新小说"
-    python3 scripts/create_project.py "我的新小说" --target /path/to/books
+    python scripts/create_project.py "我的新小说"
+    python scripts/create_project.py "我的新小说" --target /path/to/books
 """
 
 from __future__ import annotations

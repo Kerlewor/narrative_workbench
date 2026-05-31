@@ -6,8 +6,8 @@ stress_response, speech_style) and outputs potential drift warnings.
 Does NOT make final judgments — only flags items for Review attention.
 
 Usage:
-    python3 scripts/character_drift_report.py --chapter 12
-    python3 scripts/character_drift_report.py --chapter 12 --character 林半夏
+    python scripts/character_drift_report.py --chapter 12
+    python scripts/character_drift_report.py --chapter 12 --character 林半夏
 """
 
 from __future__ import annotations

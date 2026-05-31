@@ -14,7 +14,7 @@
 
 若当前目录路径包含 `_frameworks/narrative_workbench`，先运行:
 ```bash
-python3 scripts/create_project.py "项目名"
+python scripts/create_project.py "项目名"
 ```
 
 ## 目录结构
@@ -85,17 +85,17 @@ Agent 在同一主会话内持续存活。首次创建时发送项目基线，�
 
 ```bash
 # 新书/批量/进入新卷后
-python3 scripts/doctor.py && python3 scripts/structure_report.py
+python scripts/doctor.py && python scripts/structure_report.py
 
 # 规划前
-python3 scripts/hook_report.py --current N-1 && python3 scripts/hook_matrix.py --current N-1
+python scripts/hook_report.py --current N-1 && python scripts/hook_matrix.py --current N-1
 
 # Final-check 前 (必须)
-python3 scripts/gatekeeper.py --chapter N --stage final
-python3 scripts/text_audit.py chapters/000N_标题.md
+python scripts/gatekeeper.py --chapter N --stage final
+python scripts/text_audit.py chapters/000N_标题.md
 
 # 正文写入后
-python3 scripts/chapter_index.py --write && python3 scripts/doctor.py
+python scripts/chapter_index.py --write && python scripts/doctor.py
 ```
 
 ## 硬性格式规则

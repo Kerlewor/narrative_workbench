@@ -3,8 +3,8 @@
 ## create_project.py
 
 ```bash
-python3 scripts/create_project.py "我的新小说"
-python3 scripts/create_project.py "我的新小说" --target /path/to/books
+python scripts/create_project.py "我的新小说"
+python scripts/create_project.py "我的新小说" --target /path/to/books
 ```
 
 用途：
@@ -20,7 +20,7 @@ python3 scripts/create_project.py "我的新小说" --target /path/to/books
 运行：
 
 ```bash
-python3 scripts/doctor.py
+python scripts/doctor.py
 ```
 
 检查内容：
@@ -44,8 +44,8 @@ python3 scripts/doctor.py
 ## chapter_index.py
 
 ```bash
-python3 scripts/chapter_index.py --check
-python3 scripts/chapter_index.py --write
+python scripts/chapter_index.py --check
+python scripts/chapter_index.py --write
 ```
 
 用途：
@@ -57,7 +57,7 @@ python3 scripts/chapter_index.py --write
 ## text_audit.py
 
 ```bash
-python3 scripts/text_audit.py chapters/0001_标题.md
+python scripts/text_audit.py chapters/0001_标题.md
 ```
 
 用途：
@@ -70,7 +70,7 @@ python3 scripts/text_audit.py chapters/0001_标题.md
 ## hook_report.py
 
 ```bash
-python3 scripts/hook_report.py --current 12
+python scripts/hook_report.py --current 12
 ```
 
 用途：
@@ -82,7 +82,7 @@ python3 scripts/hook_report.py --current 12
 ## hook_matrix.py
 
 ```bash
-python3 scripts/hook_matrix.py --current 12
+python scripts/hook_matrix.py --current 12
 ```
 
 用途：
@@ -97,7 +97,7 @@ python3 scripts/hook_matrix.py --current 12
 ## structure_report.py
 
 ```bash
-python3 scripts/structure_report.py
+python scripts/structure_report.py
 ```
 
 用途：
@@ -111,8 +111,8 @@ python3 scripts/structure_report.py
 ## skill_check.py
 
 ```bash
-python3 scripts/skill_check.py
-python3 scripts/skill_check.py --skill skill-name
+python scripts/skill_check.py
+python scripts/skill_check.py --skill skill-name
 ```
 
 用途：
@@ -126,8 +126,8 @@ python3 scripts/skill_check.py --skill skill-name
 ## context_builder.py
 
 ```bash
-python3 scripts/context_builder.py --chapter 12 --agent writer
-python3 scripts/context_builder.py --chapter 12 --agent review
+python scripts/context_builder.py --chapter 12 --agent writer
+python scripts/context_builder.py --chapter 12 --agent review
 ```
 
 用途：
@@ -141,8 +141,8 @@ python3 scripts/context_builder.py --chapter 12 --agent review
 ## prompt_compiler.py
 
 ```bash
-python3 scripts/prompt_compiler.py --chapter 12 --agent writer
-python3 scripts/prompt_compiler.py --chapter 12 --agent writer --context runtime/chapter-0012.writer.context.md
+python scripts/prompt_compiler.py --chapter 12 --agent writer
+python scripts/prompt_compiler.py --chapter 12 --agent writer --context runtime/chapter-0012.writer.context.md
 ```
 
 用途：
@@ -154,7 +154,7 @@ python3 scripts/prompt_compiler.py --chapter 12 --agent writer --context runtime
 ## gatekeeper.py
 
 ```bash
-python3 scripts/gatekeeper.py --chapter 12 --stage final
+python scripts/gatekeeper.py --chapter 12 --stage final
 ```
 
 用途：
@@ -170,9 +170,9 @@ python3 scripts/gatekeeper.py --chapter 12 --stage final
 ## knowledge_index.py
 
 ```bash
-python3 scripts/knowledge_index.py build
-python3 scripts/knowledge_index.py query --chapter 12 --agent writer
-python3 scripts/knowledge_index.py query --domain 中医方剂 --keyword 金疮药
+python scripts/knowledge_index.py build
+python scripts/knowledge_index.py query --chapter 12 --agent writer
+python scripts/knowledge_index.py query --domain 中医方剂 --keyword 金疮药
 ```
 
 用途：
@@ -185,8 +185,8 @@ python3 scripts/knowledge_index.py query --domain 中医方剂 --keyword 金疮�
 ## status.py
 
 ```bash
-python3 scripts/status.py
-python3 scripts/status.py --verbose
+python scripts/status.py
+python scripts/status.py --verbose
 ```
 
 用途：
@@ -198,8 +198,8 @@ python3 scripts/status.py --verbose
 ## style_report.py
 
 ```bash
-python3 scripts/style_report.py --chapter 12
-python3 scripts/style_report.py --input chapters/0012_标题.md
+python scripts/style_report.py --chapter 12
+python scripts/style_report.py --input chapters/0012_标题.md
 ```
 
 用途：
@@ -211,8 +211,8 @@ python3 scripts/style_report.py --input chapters/0012_标题.md
 ## character_drift_report.py
 
 ```bash
-python3 scripts/character_drift_report.py --chapter 12
-python3 scripts/character_drift_report.py --chapter 12 --character 林半夏
+python scripts/character_drift_report.py --chapter 12
+python scripts/character_drift_report.py --chapter 12 --character 林半夏
 ```
 
 用途：
@@ -224,7 +224,7 @@ python3 scripts/character_drift_report.py --chapter 12 --character 林半夏
 ## decompose_style.py
 
 ```bash
-python3 scripts/decompose_style.py --input chapters/drafts/author-sample.md
+python scripts/decompose_style.py --input chapters/drafts/author-sample.md
 ```
 
 用途：
@@ -237,8 +237,8 @@ python3 scripts/decompose_style.py --input chapters/drafts/author-sample.md
 ## import_inkos_project.py
 
 ```bash
-python3 scripts/import_inkos_project.py /path/to/inkos-book
-python3 scripts/import_inkos_project.py /path/to/inkos-book --dry-run
+python scripts/import_inkos_project.py /path/to/inkos-book
+python scripts/import_inkos_project.py /path/to/inkos-book --dry-run
 ```
 
 用途：
@@ -250,8 +250,8 @@ python3 scripts/import_inkos_project.py /path/to/inkos-book --dry-run
 ## review_author_chapter.py
 
 ```bash
-python3 scripts/review_author_chapter.py --chapter 12
-python3 scripts/review_author_chapter.py --input chapters/drafts/my-chapter.md
+python scripts/review_author_chapter.py --chapter 12
+python scripts/review_author_chapter.py --input chapters/drafts/my-chapter.md
 ```
 
 用途：
@@ -263,8 +263,8 @@ python3 scripts/review_author_chapter.py --input chapters/drafts/my-chapter.md
 ## polish_author_chapter.py
 
 ```bash
-python3 scripts/polish_author_chapter.py --chapter 12 --mode light
-python3 scripts/polish_author_chapter.py --chapter 12 --mode anti-ai
+python scripts/polish_author_chapter.py --chapter 12 --mode light
+python scripts/polish_author_chapter.py --chapter 12 --mode anti-ai
 ```
 
 用途：
@@ -276,8 +276,8 @@ python3 scripts/polish_author_chapter.py --chapter 12 --mode anti-ai
 ## relevance_resolver.py
 
 ```bash
-python3 scripts/relevance_resolver.py --chapter 12 --agent writer
-python3 scripts/relevance_resolver.py --chapter 12 --agent review
+python scripts/relevance_resolver.py --chapter 12 --agent writer
+python scripts/relevance_resolver.py --chapter 12 --agent review
 ```
 
 用途：
@@ -290,10 +290,10 @@ python3 scripts/relevance_resolver.py --chapter 12 --agent review
 ## ledger_manager.py
 
 ```bash
-python3 scripts/ledger_manager.py init
-python3 scripts/ledger_manager.py add hooks '{"id":"HOOK_001",...}'
-python3 scripts/ledger_manager.py query hooks --filter 'status=="open"'
-python3 scripts/ledger_manager.py validate
+python scripts/ledger_manager.py init
+python scripts/ledger_manager.py add hooks '{"id":"HOOK_001",...}'
+python scripts/ledger_manager.py query hooks --filter 'status=="open"'
+python scripts/ledger_manager.py validate
 ```
 
 用途：
@@ -305,8 +305,8 @@ python3 scripts/ledger_manager.py validate
 ## render_views.py
 
 ```bash
-python3 scripts/render_views.py all
-python3 scripts/render_views.py hooks
+python scripts/render_views.py all
+python scripts/render_views.py hooks
 ```
 
 用途：
@@ -317,8 +317,8 @@ python3 scripts/render_views.py hooks
 ## director_sheet.py
 
 ```bash
-python3 scripts/director_sheet.py --chapter 19 --from-template
-python3 scripts/director_sheet.py --chapter 19 --validate
+python scripts/director_sheet.py --chapter 19 --from-template
+python scripts/director_sheet.py --chapter 19 --validate
 ```
 
 用途：
@@ -331,9 +331,9 @@ python3 scripts/director_sheet.py --chapter 19 --validate
 ## sync_skills.py
 
 ```bash
-python3 scripts/sync_skills.py
-python3 scripts/sync_skills.py --dry-run
-python3 scripts/sync_skills.py --clean
+python scripts/sync_skills.py
+python scripts/sync_skills.py --dry-run
+python scripts/sync_skills.py --clean
 ```
 
 用途：

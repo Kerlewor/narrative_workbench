@@ -12,9 +12,9 @@ Key improvements over context_builder:
   - Budget-aware: proactive trimming with explanations
 
 Usage:
-    python3 scripts/relevance_resolver.py --chapter 19 --agent writer
-    python3 scripts/relevance_resolver.py --chapter 19 --agent review
-    python3 scripts/relevance_resolver.py --chapter 19 --from-plan plan.yaml
+    python scripts/relevance_resolver.py --chapter 19 --agent writer
+    python scripts/relevance_resolver.py --chapter 19 --agent review
+    python scripts/relevance_resolver.py --chapter 19 --from-plan plan.yaml
 """
 
 from __future__ import annotations

@@ -5,8 +5,8 @@ Analyzes chapter text for sentence length distribution, dialogue ratio,
 AI-style pattern hits, and generates a quantitative style report.
 
 Usage:
-    python3 scripts/style_report.py --chapter 12
-    python3 scripts/style_report.py --input chapters/0012_标题.md
+    python scripts/style_report.py --chapter 12
+    python scripts/style_report.py --input chapters/0012_标题.md
 
 Output:
     story/runtime/chapter-0012.style_report.md

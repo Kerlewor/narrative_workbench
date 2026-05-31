@@ -5,10 +5,10 @@ in story/views/. The dual-track system preserves both program-retrievable
 JSONL (for scripts/agents) and human-readable Markdown (for authors).
 
 Usage:
-    python3 scripts/render_views.py all              # Render all views
-    python3 scripts/render_views.py hooks            # Render only hook dashboard
-    python3 scripts/render_views.py knowledge        # Render knowledge boundary matrix
-    python3 scripts/render_views.py timeline         # Render timeline view
+    python scripts/render_views.py all              # Render all views
+    python scripts/render_views.py hooks            # Render only hook dashboard
+    python scripts/render_views.py knowledge        # Render knowledge boundary matrix
+    python scripts/render_views.py timeline         # Render timeline view
 """
 
 from __future__ import annotations

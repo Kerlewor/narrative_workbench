@@ -6,8 +6,8 @@ This importer is intended for user-owned InkOS-style projects.
 It does NOT include, copy, or redistribute InkOS source code or prompt text.
 
 Usage:
-    python3 scripts/import_inkos_project.py /path/to/inkos-book
-    python3 scripts/import_inkos_project.py /path/to/inkos-book --dry-run
+    python scripts/import_inkos_project.py /path/to/inkos-book
+    python scripts/import_inkos_project.py /path/to/inkos-book --dry-run
 """
 
 from __future__ import annotations
@@ -122,7 +122,7 @@ def main() -> int:
     if args.dry_run:
         print("\n(仅预览模式，未实际复制文件。去掉 --dry-run 执行实际导入。)")
     else:
-        print("\n导入完成。建议运行: python3 scripts/doctor.py + python3 scripts/structure_report.py")
+        print("\n导入完成。建议运行: python scripts/doctor.py + python scripts/structure_report.py")
 
     return 0
 

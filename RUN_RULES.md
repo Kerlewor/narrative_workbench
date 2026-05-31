@@ -34,24 +34,24 @@
 
 | 阶段 | 必须运行 | 结果写入 |
 | --- | --- | --- |
-| 新书初始化后 | `python3 scripts/doctor.py`、`python3 scripts/structure_report.py` | `story/current_focus.md` 或初始化记录 |
-| 搭建大纲完成后 | `python3 scripts/structure_report.py`、`python3 scripts/doctor.py` | `story/current_focus.md` |
-| 注册或修改 skill 后 | `python3 scripts/skill_check.py`、`python3 scripts/doctor.py` | skill request 或修改说明 |
-| 规划第 N 章前 | `python3 scripts/hook_report.py --current N-1`、`python3 scripts/hook_matrix.py --current N-1` | `chapter-000N.intent.md` 的 Hook 预算 |
-| 批量规划前 | `python3 scripts/doctor.py`、`python3 scripts/hook_report.py --current N-1`、`python3 scripts/hook_matrix.py --current N-1`、`python3 scripts/structure_report.py` | `batch-000N-000M.plan.md` |
-| Writer 前 | 建议 `python3 scripts/relevance_resolver.py --chapter N --agent writer`（优先）或 `python3 scripts/context_builder.py --chapter N --agent writer` + `python3 scripts/prompt_compiler.py --chapter N --agent writer`；必须读取 intent / plan / hook_protocol | `chapter-000N.writer.md` handoff |
-| Polish 前 | 建议 `python3 scripts/context_builder.py --chapter N --agent polish` + `python3 scripts/prompt_compiler.py --chapter N --agent polish`；必须读取 style_profile / style_guide | `chapter-000N.polish.md` handoff |
-| Review 前 | 建议 `python3 scripts/context_builder.py --chapter N --agent review` + `python3 scripts/prompt_compiler.py --chapter N --agent review`；若已有候选正文文件，运行 `python3 scripts/text_audit.py <候选正文路径>` | `chapter-000N.review.md` |
-| Fixer 前 | 建议 `python3 scripts/context_builder.py --chapter N --agent fixer` + `python3 scripts/prompt_compiler.py --chapter N --agent fixer` | `chapter-000N.fixer.md` handoff |
-| Final-check 前 | **必须** `python3 scripts/gatekeeper.py --chapter N --stage final`；`python3 scripts/text_audit.py chapters/000N_标题.md` 或候选稿路径；`python3 scripts/hook_report.py --current N`；`python3 scripts/hook_matrix.py --current N` | `chapter-000N.final-check.md` |
-| 正文写入后 | `python3 scripts/chapter_index.py --write`、`python3 scripts/doctor.py` | `chapter-000N.final-check.md` |
-| 批末审计 | `python3 scripts/doctor.py`、`python3 scripts/chapter_index.py --check`、`python3 scripts/hook_report.py --current M`、`python3 scripts/hook_matrix.py --current M`、`python3 scripts/structure_report.py` | `batch-000N-000M.audit.md` |
-| 进入新卷前 | `python3 scripts/structure_report.py`、`python3 scripts/hook_matrix.py --current N`、`python3 scripts/doctor.py` | `story/current_focus.md` 和新卷 plan |
-| 手动改状态文件后 | `python3 scripts/doctor.py`、必要时 `python3 scripts/structure_report.py` | 修改说明或 drift check |
-| 初始化账本 | `python3 scripts/ledger_manager.py init` + `python3 scripts/ledger_manager.py validate` | `story/ledger/*.jsonl` |
-| 更新视图 | `python3 scripts/render_views.py all` | `story/views/*.md` |
-| 同步 Skills | `python3 scripts/sync_skills.py` | `.claude/skills/` + `.agents/skills/` |
-| 章节导演表 | `python3 scripts/director_sheet.py --chapter N --from-template` | `story/plans/chapter_NNNN_director_sheet.yaml` |
+| 新书初始化后 | `python scripts/doctor.py`、`python scripts/structure_report.py` | `story/current_focus.md` 或初始化记录 |
+| 搭建大纲完成后 | `python scripts/structure_report.py`、`python scripts/doctor.py` | `story/current_focus.md` |
+| 注册或修改 skill 后 | `python scripts/skill_check.py`、`python scripts/doctor.py` | skill request 或修改说明 |
+| 规划第 N 章前 | `python scripts/hook_report.py --current N-1`、`python scripts/hook_matrix.py --current N-1` | `chapter-000N.intent.md` 的 Hook 预算 |
+| 批量规划前 | `python scripts/doctor.py`、`python scripts/hook_report.py --current N-1`、`python scripts/hook_matrix.py --current N-1`、`python scripts/structure_report.py` | `batch-000N-000M.plan.md` |
+| Writer 前 | 建议 `python scripts/relevance_resolver.py --chapter N --agent writer`（优先）或 `python scripts/context_builder.py --chapter N --agent writer` + `python scripts/prompt_compiler.py --chapter N --agent writer`；必须读取 intent / plan / hook_protocol | `chapter-000N.writer.md` handoff |
+| Polish 前 | 建议 `python scripts/context_builder.py --chapter N --agent polish` + `python scripts/prompt_compiler.py --chapter N --agent polish`；必须读取 style_profile / style_guide | `chapter-000N.polish.md` handoff |
+| Review 前 | 建议 `python scripts/context_builder.py --chapter N --agent review` + `python scripts/prompt_compiler.py --chapter N --agent review`；若已有候选正文文件，运行 `python scripts/text_audit.py <候选正文路径>` | `chapter-000N.review.md` |
+| Fixer 前 | 建议 `python scripts/context_builder.py --chapter N --agent fixer` + `python scripts/prompt_compiler.py --chapter N --agent fixer` | `chapter-000N.fixer.md` handoff |
+| Final-check 前 | **必须** `python scripts/gatekeeper.py --chapter N --stage final`；`python scripts/text_audit.py chapters/000N_标题.md` 或候选稿路径；`python scripts/hook_report.py --current N`；`python scripts/hook_matrix.py --current N` | `chapter-000N.final-check.md` |
+| 正文写入后 | `python scripts/chapter_index.py --write`、`python scripts/doctor.py` | `chapter-000N.final-check.md` |
+| 批末审计 | `python scripts/doctor.py`、`python scripts/chapter_index.py --check`、`python scripts/hook_report.py --current M`、`python scripts/hook_matrix.py --current M`、`python scripts/structure_report.py` | `batch-000N-000M.audit.md` |
+| 进入新卷前 | `python scripts/structure_report.py`、`python scripts/hook_matrix.py --current N`、`python scripts/doctor.py` | `story/current_focus.md` 和新卷 plan |
+| 手动改状态文件后 | `python scripts/doctor.py`、必要时 `python scripts/structure_report.py` | 修改说明或 drift check |
+| 初始化账本 | `python scripts/ledger_manager.py init` + `python scripts/ledger_manager.py validate` | `story/ledger/*.jsonl` |
+| 更新视图 | `python scripts/render_views.py all` | `story/views/*.md` |
+| 同步 Skills | `python scripts/sync_skills.py` | `.claude/skills/` + `.agents/skills/` |
+| 章节导演表 | `python scripts/director_sheet.py --chapter N --from-template` | `story/plans/chapter_NNNN_director_sheet.yaml` |
 
 ## 脚本职责
 

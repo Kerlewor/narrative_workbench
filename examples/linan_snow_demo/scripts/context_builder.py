@@ -5,9 +5,9 @@ Builds per-agent context packets that include only what each agent needs.
 Reduces context bloat by omitting files irrelevant to the agent's task.
 
 Usage:
-    python3 scripts/context_builder.py --chapter 12 --agent writer
-    python3 scripts/context_builder.py --chapter 12 --agent review
-    python3 scripts/context_builder.py --chapter 12 --agent polish
+    python scripts/context_builder.py --chapter 12 --agent writer
+    python scripts/context_builder.py --chapter 12 --agent review
+    python scripts/context_builder.py --chapter 12 --agent polish
 
 Output:
     story/runtime/chapter-0012.<agent>.context.md

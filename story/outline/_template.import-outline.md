@@ -159,8 +159,8 @@
 导入完成后运行：
 
 ```bash
-python3 scripts/structure_report.py
-python3 scripts/doctor.py
+python scripts/structure_report.py
+python scripts/doctor.py
 ```
 
 如果已生成 hook candidate 表，但尚未写正文，不运行 `hook_report.py` 作为正式伏笔审计；正式 hook 审计从正文定稿后开始。

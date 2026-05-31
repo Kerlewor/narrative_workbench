@@ -38,10 +38,10 @@ maxChapters: 5
 
 ## Python 辅助报告
 
-- `python3 scripts/hook_report.py --current N-1` 输出摘要（N 是本批首章号，N-1 是最新已定稿章）：
-- `python3 scripts/hook_matrix.py --current N-1` 输出摘要：
-- `python3 scripts/structure_report.py` 输出摘要：
-- `python3 scripts/doctor.py` 是否通过：
+- `python scripts/hook_report.py --current N-1` 输出摘要（N 是本批首章号，N-1 是最新已定稿章）：
+- `python scripts/hook_matrix.py --current N-1` 输出摘要：
+- `python scripts/structure_report.py` 输出摘要：
+- `python scripts/doctor.py` 是否通过：
 
 ## 情绪曲线
 

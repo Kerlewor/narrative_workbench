@@ -14,9 +14,9 @@ The canonical skill implementation lives in skills/<name>/prompt.md.
 The wrapper just points to it.
 
 Usage:
-    python3 scripts/sync_skills.py              # Sync all skills
-    python3 scripts/sync_skills.py --dry-run    # Show what would be created
-    python3 scripts/sync_skills.py --clean      # Remove stale wrappers
+    python scripts/sync_skills.py              # Sync all skills
+    python scripts/sync_skills.py --dry-run    # Show what would be created
+    python scripts/sync_skills.py --clean      # Remove stale wrappers
 """
 
 from __future__ import annotations
@@ -151,22 +151,22 @@ def _write_codex_hooks() -> None:
             "post-chapter": {
                 "description": "Run after writing a chapter to canonical",
                 "scripts": [
-                    "python3 scripts/chapter_index.py --write",
-                    "python3 scripts/doctor.py",
+                    "python scripts/chapter_index.py --write",
+                    "python scripts/doctor.py",
                 ],
             },
             "pre-batch": {
                 "description": "Run before batch writing",
                 "scripts": [
-                    "python3 scripts/hook_report.py --current N-1",
-                    "python3 scripts/hook_matrix.py --current N-1",
-                    "python3 scripts/structure_report.py",
+                    "python scripts/hook_report.py --current N-1",
+                    "python scripts/hook_matrix.py --current N-1",
+                    "python scripts/structure_report.py",
                 ],
             },
             "gatekeeper": {
                 "description": "Gatekeeper check before final-check",
                 "scripts": [
-                    "python3 scripts/gatekeeper.py --chapter N --stage final",
+                    "python scripts/gatekeeper.py --chapter N --stage final",
                 ],
             },
         },

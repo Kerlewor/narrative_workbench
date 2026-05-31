@@ -54,25 +54,25 @@ linan_snow_demo/
 cd examples/linan_snow_demo
 
 # 项目健康检查
-python3 ../../scripts/doctor.py
+python ../../scripts/doctor.py
 
 # 项目状态概览
-python3 ../../scripts/status.py
+python ../../scripts/status.py
 
 # 为 Writer 构建 Ch1 上下文包
-python3 ../../scripts/context_builder.py --chapter 1 --agent writer
+python ../../scripts/context_builder.py --chapter 1 --agent writer
 
 # 运行确定性门禁
-python3 ../../scripts/gatekeeper.py --chapter 1 --stage final
+python ../../scripts/gatekeeper.py --chapter 1 --stage final
 
 # 为手写稿生成审查简报
-python3 ../../scripts/review_author_chapter.py --chapter 1
+python ../../scripts/review_author_chapter.py --chapter 1
 
 # 分析手写稿文风
-python3 ../../scripts/decompose_style.py --input chapters/drafts/chapter-0001.author.md
+python ../../scripts/decompose_style.py --input chapters/drafts/chapter-0001.author.md
 
 # 构建知识库索引
-python3 ../../scripts/knowledge_index.py build
+python ../../scripts/knowledge_index.py build
 ```
 
 ## 快速验证：v0.3 新增功能
@@ -82,32 +82,32 @@ cd examples/linan_snow_demo
 
 # === 上下文引擎 ===
 # 精确上下文注入（替代 context_builder 核心逻辑）
-python3 ../../scripts/relevance_resolver.py --chapter 1 --agent writer
+python ../../scripts/relevance_resolver.py --chapter 1 --agent writer
 
 # === 结构化账本 ===
 # 查看账本状态
-python3 ../../scripts/ledger_manager.py validate
+python ../../scripts/ledger_manager.py validate
 
 # 查询活跃伏笔
-python3 ../../scripts/ledger_manager.py query hooks --filter 'status=="open"'
+python ../../scripts/ledger_manager.py query hooks --filter 'status=="open"'
 
 # 查询所有事实
-python3 ../../scripts/ledger_manager.py list facts
+python ../../scripts/ledger_manager.py list facts
 
 # === 视图渲染 ===
 # 生成全部作者可读 Markdown 视图
-python3 ../../scripts/render_views.py all
+python ../../scripts/render_views.py all
 # 查看: cat story/views/hook_dashboard.md
 
 # === 章节统筹 ===
 # 为 Ch1 生成导演表
-python3 ../../scripts/director_sheet.py --chapter 3 --from-template --title "入局"
+python ../../scripts/director_sheet.py --chapter 3 --from-template --title "入局"
 
 # 验证已有导演表
-python3 ../../scripts/director_sheet.py --chapter 1 --validate
+python ../../scripts/director_sheet.py --chapter 1 --validate
 
 # === 平台同步（仅演示，需在模板目录运行） ===
-# python3 ../../scripts/sync_skills.py --dry-run
+# python ../../scripts/sync_skills.py --dry-run
 ```
 
 ## 演示要点

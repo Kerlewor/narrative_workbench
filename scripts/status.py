@@ -4,8 +4,8 @@
 Quick overview of project progress, active hooks, drift risks, and suggested next steps.
 
 Usage:
-    python3 scripts/status.py
-    python3 scripts/status.py --verbose
+    python scripts/status.py
+    python scripts/status.py --verbose
 """
 
 from __future__ import annotations

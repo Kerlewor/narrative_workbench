@@ -62,6 +62,8 @@ AI: [运行 create_project.py] 项目已创建。要开始搭建大纲吗？
 
 如果只想先看看项目长什么样，打开 [`examples/linan_snow_demo/`](examples/linan_snow_demo/)——它是一个完整的最小演示项目，包含角色卡、伏笔池、intent/plan 和一篇手写稿，可以直接跑脚本验证。
 
+> **Windows 用户：** Claude Code 和 Codex 在 Windows 上通过 WSL 或 Git Bash 运行，脚本命令与 Linux/macOS 完全一致。如果在原生 Windows 终端手动运行脚本，将 `python3` 替换为 `python`。所有 `&&` 在 CMD 中无效，请逐行运行。
+
 ## 用户命令
 
 | 命令 | 说明 |
@@ -198,7 +200,7 @@ skill 输出进入 story/runtime/chapter-000N.skill-SKILLNAME.md
 ### 构建索引
 
 ```bash
-python3 scripts/knowledge_index.py build
+python scripts/knowledge_index.py build
 ```
 
 扫描项目文件（角色卡、大纲、章节、伏笔池），提取实体和文件元数据，生成 `.nw_index/entity_index.json`。
@@ -208,13 +210,13 @@ python3 scripts/knowledge_index.py build
 按章节生成知识包（供 context_builder 和 prompt_compiler 使用）：
 
 ```bash
-python3 scripts/knowledge_index.py query --chapter 12 --agent writer
+python scripts/knowledge_index.py query --chapter 12 --agent writer
 ```
 
 按领域和关键词查询：
 
 ```bash
-python3 scripts/knowledge_index.py query --domain 中医方剂 --keyword 金疮药
+python scripts/knowledge_index.py query --domain 中医方剂 --keyword 金疮药
 ```
 
 ### 知识库与 Skill 的关系

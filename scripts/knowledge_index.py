@@ -5,9 +5,9 @@ Builds and queries a lightweight project knowledge index.
 First version uses keyword + metadata — no vector database.
 
 Usage:
-    python3 scripts/knowledge_index.py build
-    python3 scripts/knowledge_index.py query --chapter 12 --agent writer
-    python3 scripts/knowledge_index.py query --domain 中医方剂 --keyword 金疮药
+    python scripts/knowledge_index.py build
+    python scripts/knowledge_index.py query --chapter 12 --agent writer
+    python scripts/knowledge_index.py query --domain 中医方剂 --keyword 金疮药
 
 Output:
     runtime/chapter-0012.knowledge_packet.md (query mode)
@@ -178,7 +178,7 @@ def build_knowledge_packet(chapter: int, agent: str = "writer") -> str:
 
 def cmd_query(args: argparse.Namespace) -> int:
     if not ENTITY_INDEX_PATH.is_file():
-        print("索引尚未构建。请先运行: python3 scripts/knowledge_index.py build")
+        print("索引尚未构建。请先运行: python scripts/knowledge_index.py build")
         return 1
 
     if args.chapter:

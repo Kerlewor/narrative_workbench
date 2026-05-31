@@ -2,8 +2,8 @@
 """Validate skills/skill_registry.md.
 
 Usage:
-    python3 scripts/skill_check.py
-    python3 scripts/skill_check.py --skill skill-name
+    python scripts/skill_check.py
+    python scripts/skill_check.py --skill skill-name
 """
 
 from __future__ import annotations

@@ -8,8 +8,8 @@ The actual polishing is performed by Claude Code/Codex via the Polish Agent.
 Supports 5 polish modes. Does NOT overwrite the original.
 
 Usage:
-    python3 scripts/polish_author_chapter.py --chapter 12 --mode light
-    python3 scripts/polish_author_chapter.py --input chapters/drafts/my-chapter.md --mode anti-ai
+    python scripts/polish_author_chapter.py --chapter 12 --mode light
+    python scripts/polish_author_chapter.py --input chapters/drafts/my-chapter.md --mode anti-ai
 """
 
 from __future__ import annotations

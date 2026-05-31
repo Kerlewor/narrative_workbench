@@ -2,7 +2,7 @@
 """Report hook budget and half-life status from story/pending_hooks.md.
 
 Usage:
-    python3 scripts/hook_report.py --current 42
+    python scripts/hook_report.py --current 42
 """
 
 from __future__ import annotations

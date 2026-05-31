@@ -45,10 +45,10 @@ status: final-check
 - [ ] `story/current_focus.md`
 - [ ] `story/state/*.json`
 - [ ] runtime 状态改为 `final-aligned`
-- [ ] 已运行 `python3 scripts/text_audit.py chapters/000N_标题.md`
-- [ ] 已运行 `python3 scripts/chapter_index.py --write`
-- [ ] 必要时已运行 `python3 scripts/hook_report.py --current N`
-- [ ] 必要时已运行 `python3 scripts/hook_matrix.py --current N`
+- [ ] 已运行 `python scripts/text_audit.py chapters/000N_标题.md`
+- [ ] 已运行 `python scripts/chapter_index.py --write`
+- [ ] 必要时已运行 `python scripts/hook_report.py --current N`
+- [ ] 必要时已运行 `python scripts/hook_matrix.py --current N`
 - [ ] 已审查本章 skill request，明确 adopted / rejected
 
 ## 结论

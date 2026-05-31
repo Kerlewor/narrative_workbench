@@ -110,7 +110,7 @@ tests/                    回归测试
 
 推荐做法：
 
-1. 在模板目录运行 `python3 scripts/create_project.py "新书名"`。
+1. 在模板目录运行 `python scripts/create_project.py "新书名"`。
 2. 进入生成的新书目录。
 3. 从新书目录根部启动 Claude Code。
 4. 让 AI 先读取 `START_HERE.md` 和 `CLAUDE.md`。
@@ -119,8 +119,8 @@ tests/                    回归测试
 7. 大纲完成后运行：
 
 ```bash
-python3 scripts/doctor.py
-python3 scripts/structure_report.py
+python scripts/doctor.py
+python scripts/structure_report.py
 ```
 
 8. 然后开始：
@@ -233,7 +233,7 @@ Claude Code 支持按 subagent 分配模型。例如在 `.claude/settings.json` 
 ```json
 {
   "permissions": {
-    "allow": ["Bash(python3 scripts/*)"]
+    "allow": ["Bash(python scripts/*)"]
   }
 }
 ```

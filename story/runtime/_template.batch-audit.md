@@ -73,11 +73,11 @@ status: audited
 
 | 脚本 | 结果 | 问题 | 处理 |
 | --- | --- | --- | --- |
-| `python3 scripts/doctor.py` |  |  |  |
-| `python3 scripts/chapter_index.py --check` |  |  |  |
-| `python3 scripts/hook_report.py --current M` |  |  |  |
-| `python3 scripts/hook_matrix.py --current M` |  |  |  |
-| `python3 scripts/structure_report.py` |  |  |  |
+| `python scripts/doctor.py` |  |  |  |
+| `python scripts/chapter_index.py --check` |  |  |  |
+| `python scripts/hook_report.py --current M` |  |  |  |
+| `python scripts/hook_matrix.py --current M` |  |  |  |
+| `python scripts/structure_report.py` |  |  |  |
 
 ## 结论
 

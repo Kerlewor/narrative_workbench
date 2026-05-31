@@ -7,8 +7,8 @@ Analyzes input text across 12 dimensions and generates:
   3. style_skill.md — Agent-executable style rules
 
 Usage:
-    python3 scripts/decompose_style.py --input chapters/drafts/author-sample.md
-    python3 scripts/decompose_style.py --input story/style_samples/reference.md --output-dir story/style_samples/
+    python scripts/decompose_style.py --input chapters/drafts/author-sample.md
+    python scripts/decompose_style.py --input story/style_samples/reference.md --output-dir story/style_samples/
 """
 
 from __future__ import annotations

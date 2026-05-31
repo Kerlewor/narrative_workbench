@@ -12,7 +12,7 @@
 如果当前目录是 `_frameworks/narrative_workbench`，这是模板目录。除非用户明确要求修改模板，不要直接在这里搭建大纲或写正文。应先运行：
 
 ```bash
-python3 scripts/create_project.py "项目名"
+python scripts/create_project.py "项目名"
 ```
 
 然后进入新项目目录继续。
@@ -25,7 +25,7 @@ python3 scripts/create_project.py "项目名"
 
 写关键场景、关系转折、身份揭露、高潮或重要 hook 回收时，请使用 story/runtime/_template.scene-beat.md 拆场景，并遵守 story/style_blacklist.md。
 如果我点名某个 skill，或章节计划声明需要 skill，请按 skills/skill_protocol.md 和 skills/skill_registry.md 创建 skill request，skill 输出只进入 story/runtime/，由主会话 final-check 后决定是否采纳。
-如果该 skill 尚未注册，请先登记到 skills/skill_registry.md，并运行 `python3 scripts/skill_check.py --skill SKILL_NAME` 验证。
+如果该 skill 尚未注册，请先登记到 skills/skill_registry.md，并运行 `python scripts/skill_check.py --skill SKILL_NAME` 验证。
 
 如果大纲已经完成，请先做 drift check，再根据我的命令执行：
 - "规划第 N 章"
@@ -46,13 +46,13 @@ Agent 只能写 story/runtime/ 中的 working 文件，canonical 状态由主会
 
 ## 新书初始化建议
 
-1. 运行 `python3 scripts/create_project.py "项目名"` 创建新书目录。
+1. 运行 `python scripts/create_project.py "项目名"` 创建新书目录。
 2. 进入新书目录启动 Claude Code。
 3. 修改 `story/outline/story_frame.md` 的 YAML frontmatter。
 4. 填写 `story/book_rules.md` 的类型、视角、节奏硬规则。
 5. 对 AI 说"搭建大纲"。
 6. 大纲、分卷、角色卡完成后再开始第 1 章。
-7. 初始化完成后运行 `python3 scripts/doctor.py` 做体检。
+7. 初始化完成后运行 `python scripts/doctor.py` 做体检。
 
 ## Claude Code 使用注意
 

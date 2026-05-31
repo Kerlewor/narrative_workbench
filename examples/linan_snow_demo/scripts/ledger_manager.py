@@ -6,12 +6,12 @@ secrets, and locations. JSONL is the primary format for script consumption;
 Markdown views are rendered separately for author readability.
 
 Usage:
-    python3 scripts/ledger_manager.py init                    # Initialize all ledger files
-    python3 scripts/ledger_manager.py add hooks '{"id":"HOOK_001",...}'
-    python3 scripts/ledger_manager.py query hooks --filter 'status=="open"'
-    python3 scripts/ledger_manager.py validate                # Validate all records against schemas
-    python3 scripts/ledger_manager.py list hooks              # List all records in a ledger
-    python3 scripts/ledger_manager.py extract --chapter 19    # Extract facts from chapter runtime
+    python scripts/ledger_manager.py init                    # Initialize all ledger files
+    python scripts/ledger_manager.py add hooks '{"id":"HOOK_001",...}'
+    python scripts/ledger_manager.py query hooks --filter 'status=="open"'
+    python scripts/ledger_manager.py validate                # Validate all records against schemas
+    python scripts/ledger_manager.py list hooks              # List all records in a ledger
+    python scripts/ledger_manager.py extract --chapter 19    # Extract facts from chapter runtime
 
 Schema:
     Each JSONL line is a JSON object. The first line of each file is a schema

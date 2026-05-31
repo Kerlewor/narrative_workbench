@@ -2,8 +2,8 @@
 """Check or update chapters/index.json from chapter files.
 
 Usage:
-    python3 scripts/chapter_index.py --check
-    python3 scripts/chapter_index.py --write
+    python scripts/chapter_index.py --check
+    python scripts/chapter_index.py --write
 """
 
 from __future__ import annotations
@@ -109,7 +109,7 @@ def main() -> int:
         print("stale index entries:")
         for item in stale:
             print(f"- {item}")
-    print("run: python3 scripts/chapter_index.py --write")
+    print("run: python scripts/chapter_index.py --write")
     return 1
 
 

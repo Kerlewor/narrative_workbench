@@ -5,7 +5,7 @@ This script does not judge story quality. It checks whether hook dependencies,
 budgets, evidence fields, and recovery metadata are mechanically coherent.
 
 Usage:
-    python3 scripts/hook_matrix.py --current 42
+    python scripts/hook_matrix.py --current 42
 """
 
 from __future__ import annotations

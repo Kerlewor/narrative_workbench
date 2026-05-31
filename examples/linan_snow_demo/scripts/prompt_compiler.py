@@ -7,9 +7,9 @@ Compiles per-agent prompts using a three-layer structure:
   3. Task Injection — chapter intent/plan, context packet, risk alerts
 
 Usage:
-    python3 scripts/prompt_compiler.py --chapter 12 --agent writer
-    python3 scripts/prompt_compiler.py --chapter 12 --agent review
-    python3 scripts/prompt_compiler.py --chapter 12 --agent writer --context runtime/chapter-0012.writer.context.md
+    python scripts/prompt_compiler.py --chapter 12 --agent writer
+    python scripts/prompt_compiler.py --chapter 12 --agent review
+    python scripts/prompt_compiler.py --chapter 12 --agent writer --context runtime/chapter-0012.writer.context.md
 
 Output:
     story/runtime/chapter-0012.<agent>.prompt.md

@@ -10,7 +10,7 @@
 
 ## 模板保护
 
-若当前目录路径包含 `_frameworks/narrative_workbench`，说明在模板目录中。除非用户明确要求修改模板，否则必须先用 `python3 scripts/create_project.py "项目名"` 创建新项目。
+若当前目录路径包含 `_frameworks/narrative_workbench`，说明在模板目录中。除非用户明确要求修改模板，否则必须先用 `python scripts/create_project.py "项目名"` 创建新项目。
 
 ## 目录结构
 
@@ -84,13 +84,13 @@ Agent 在同一主会话内持续存活。首次创建时发送项目基线，�
 ```bash
 # === 项目初始化 ===
 # 新书初始化 / 大纲搭建完成后
-python3 scripts/doctor.py && python3 scripts/structure_report.py
+python scripts/doctor.py && python scripts/structure_report.py
 
 # 初始化结构化账本 (v0.3+)
-python3 scripts/ledger_manager.py init && python3 scripts/ledger_manager.py validate
+python scripts/ledger_manager.py init && python scripts/ledger_manager.py validate
 
 # === 每章规划前 ===
-python3 scripts/hook_report.py --current N-1 && python3 scripts/hook_matrix.py --current N-1
+python scripts/hook_report.py --current N-1 && python scripts/hook_matrix.py --current N-1
 
 # === Writer/Polish/Review/Fixer 前 (建议) ===
 # Writer: relevance_resolver.py --chapter N --agent writer (优先) 或 context_builder.py + prompt_compiler.py
@@ -99,13 +99,13 @@ python3 scripts/hook_report.py --current N-1 && python3 scripts/hook_matrix.py -
 # Fixer:  context_builder.py --chapter N --agent fixer
 
 # === Final-check 前 (必须) ===
-python3 scripts/gatekeeper.py --chapter N --stage final
-python3 scripts/text_audit.py chapters/000N_标题.md
-python3 scripts/hook_report.py --current N
-python3 scripts/hook_matrix.py --current N
+python scripts/gatekeeper.py --chapter N --stage final
+python scripts/text_audit.py chapters/000N_标题.md
+python scripts/hook_report.py --current N
+python scripts/hook_matrix.py --current N
 
 # === 正文写入后 (必须) ===
-python3 scripts/chapter_index.py --write && python3 scripts/doctor.py
+python scripts/chapter_index.py --write && python scripts/doctor.py
 
 # === 批量/卷级 ===
 # 批量规划前: doctor.py + hook_report.py + hook_matrix.py + structure_report.py

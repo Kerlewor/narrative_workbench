@@ -17,7 +17,7 @@
 
 所有 Python 脚本位于模板的 `scripts/` 目录，通过相对路径调用：
 ```bash
-python3 ../../scripts/doctor.py
-python3 ../../scripts/status.py
-python3 ../../scripts/gatekeeper.py --chapter N --stage final
+python ../../scripts/doctor.py
+python ../../scripts/status.py
+python ../../scripts/gatekeeper.py --chapter N --stage final
 ```

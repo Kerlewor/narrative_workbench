@@ -2,7 +2,7 @@
 """Health check for Narrative Workbench.
 
 Run from the project root:
-    python3 scripts/doctor.py
+    python scripts/doctor.py
 """
 
 from __future__ import annotations

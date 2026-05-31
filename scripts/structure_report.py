@@ -6,7 +6,7 @@ control files are present and whether chapter/summary/runtime coverage is
 coherent enough for the AI workflow to proceed.
 
 Usage:
-    python3 scripts/structure_report.py
+    python scripts/structure_report.py
 """
 
 from __future__ import annotations

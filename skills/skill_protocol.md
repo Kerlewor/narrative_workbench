@@ -32,7 +32,7 @@ Skill 是主工作流之外的可插拔能力。它可以提供：
 
 1. 主会话先按 `skills/_template.skill-entry.md` 在 `skills/` 中创建入口说明，或在 registry 中登记外部说明位置。
 2. 更新 `skills/skill_registry.md`，状态设为 `enabled` 或 `disabled`。
-3. 运行 `python3 scripts/skill_check.py --skill SKILL_NAME`。
+3. 运行 `python scripts/skill_check.py --skill SKILL_NAME`。
 4. 通过后才能创建 skill request。
 
 ## 边界

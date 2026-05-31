@@ -6,9 +6,9 @@ for the entire chapter, defining emotional arcs, information release plans,
 style arcs, and scene chain.
 
 Usage:
-    python3 scripts/director_sheet.py --chapter 19            # Generate from plan
-    python3 scripts/director_sheet.py --chapter 19 --from-template  # Generate from template
-    python3 scripts/director_sheet.py --validate --chapter 19  # Validate existing sheet
+    python scripts/director_sheet.py --chapter 19            # Generate from plan
+    python scripts/director_sheet.py --chapter 19 --from-template  # Generate from template
+    python scripts/director_sheet.py --validate --chapter 19  # Validate existing sheet
 """
 
 from __future__ import annotations
@@ -115,7 +115,7 @@ def validate_sheet(chapter: int) -> int:
 
     if not sheet_path.is_file():
         print(f"Director sheet not found: {sheet_path}")
-        print(f"Generate one with: python3 scripts/director_sheet.py --chapter {chapter} --from-template")
+        print(f"Generate one with: python scripts/director_sheet.py --chapter {chapter} --from-template")
         return 1
 
     data = _read_yaml(sheet_path)

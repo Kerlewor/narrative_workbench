@@ -11,7 +11,7 @@ v0.2.0 的核心主题是**从 prompt 框架到小说工程运行时**。在 v0.
 **`context_builder.py`** — 为每个 Agent 按章节构建上下文包。
 
 ```bash
-python3 scripts/context_builder.py --chapter 12 --agent writer
+python scripts/context_builder.py --chapter 12 --agent writer
 ```
 
 - 5 种 Agent 各有独立的必读内容、压缩摘要和排除文件配置
@@ -22,7 +22,7 @@ python3 scripts/context_builder.py --chapter 12 --agent writer
 **`prompt_compiler.py`** — 三层 prompt 编译，使每次 Agent 输入可复现、可追溯。
 
 ```bash
-python3 scripts/prompt_compiler.py --chapter 12 --agent writer
+python scripts/prompt_compiler.py --chapter 12 --agent writer
 ```
 
 - Layer 1（Base Prompt）：从 `agents/<agent>.md` 读取，永不改变
@@ -35,7 +35,7 @@ python3 scripts/prompt_compiler.py --chapter 12 --agent writer
 **`gatekeeper.py`** — 确定性门禁检查。final-check 前必须运行。
 
 ```bash
-python3 scripts/gatekeeper.py --chapter 12 --stage final
+python scripts/gatekeeper.py --chapter 12 --stage final
 ```
 
 - 检查：流水线产物完整性、Review→Fixer 响应覆盖、hook 半衰期同步、禁止模式、intent 状态合法性
@@ -47,8 +47,8 @@ python3 scripts/gatekeeper.py --chapter 12 --stage final
 **`knowledge_index.py`** — 关键词+元数据项目索引。
 
 ```bash
-python3 scripts/knowledge_index.py build
-python3 scripts/knowledge_index.py query --chapter 12 --agent writer
+python scripts/knowledge_index.py build
+python scripts/knowledge_index.py query --chapter 12 --agent writer
 ```
 
 - build 模式：扫描项目文件，构建实体索引和文件清单
@@ -58,8 +58,8 @@ python3 scripts/knowledge_index.py query --chapter 12 --agent writer
 **`status.py`** — 项目状态概览。
 
 ```bash
-python3 scripts/status.py
-python3 scripts/status.py --verbose
+python scripts/status.py
+python scripts/status.py --verbose
 ```
 
 - 输出：章节进度、活跃/已回收 hook 数、超半衰期 hook 数、角色漂移风险、脚本数量、知识库索引状态
@@ -71,8 +71,8 @@ python3 scripts/status.py --verbose
 **`style_report.py`** — 定量文风报告。
 
 ```bash
-python3 scripts/style_report.py --chapter 12
-python3 scripts/style_report.py --input chapters/0012_标题.md
+python scripts/style_report.py --chapter 12
+python scripts/style_report.py --input chapters/0012_标题.md
 ```
 
 - 分析：句长分布（短/中/长句比例）、对白密度、段落形态、AI 味模式命中次数
@@ -81,8 +81,8 @@ python3 scripts/style_report.py --input chapters/0012_标题.md
 **`character_drift_report.py`** — 角色漂移预警。
 
 ```bash
-python3 scripts/character_drift_report.py --chapter 12
-python3 scripts/character_drift_report.py --chapter 12 --character 林半夏
+python scripts/character_drift_report.py --chapter 12
+python scripts/character_drift_report.py --chapter 12 --character 林半夏
 ```
 
 - 读取角色卡的 `cannot_do` 和 `speech_style` 约束
@@ -92,7 +92,7 @@ python3 scripts/character_drift_report.py --chapter 12 --character 林半夏
 **`decompose_style.py`** — 文风拆解器。
 
 ```bash
-python3 scripts/decompose_style.py --input chapters/drafts/author-sample.md
+python scripts/decompose_style.py --input chapters/drafts/author-sample.md
 ```
 
 - 输入文本 → 输出三个产物：
@@ -105,8 +105,8 @@ python3 scripts/decompose_style.py --input chapters/drafts/author-sample.md
 **`review_author_chapter.py`** — 手写章节审查简报。
 
 ```bash
-python3 scripts/review_author_chapter.py --chapter 12
-python3 scripts/review_author_chapter.py --input chapters/drafts/my-chapter.md
+python scripts/review_author_chapter.py --chapter 12
+python scripts/review_author_chapter.py --input chapters/drafts/my-chapter.md
 ```
 
 - 读取手写稿，生成包含检查维度和原则的审查简报
@@ -115,8 +115,8 @@ python3 scripts/review_author_chapter.py --input chapters/drafts/my-chapter.md
 **`polish_author_chapter.py`** — 手写章节润色简报。
 
 ```bash
-python3 scripts/polish_author_chapter.py --chapter 12 --mode light
-python3 scripts/polish_author_chapter.py --chapter 12 --mode anti-ai
+python scripts/polish_author_chapter.py --chapter 12 --mode light
+python scripts/polish_author_chapter.py --chapter 12 --mode anti-ai
 ```
 
 - 5 种润色模式，每种有独立的指令集
@@ -125,8 +125,8 @@ python3 scripts/polish_author_chapter.py --chapter 12 --mode anti-ai
 **`import_inkos_project.py`** — InkOS 项目迁移器。
 
 ```bash
-python3 scripts/import_inkos_project.py /path/to/inkos-book
-python3 scripts/import_inkos_project.py /path/to/inkos-book --dry-run
+python scripts/import_inkos_project.py /path/to/inkos-book
+python scripts/import_inkos_project.py /path/to/inkos-book --dry-run
 ```
 
 - 11 个文件映射规则（直接映射 + 需手动审核）
