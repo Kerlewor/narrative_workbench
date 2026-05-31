@@ -390,31 +390,19 @@ chapter_019/
 
 **此版完成后：项目从"提示词框架"升级为"小说上下文引擎"，具备分场景写作+全章统筹的完整能力，且在 Claude Code 和 Codex 上均为原生可调用。**
 
-### v0.4：作者体验增强（全 Markdown-native，无独立界面）
+### v0.4：核心引擎封装 + 统一运行入口
 
-**写作控制台与看板：**
-1. `story/DASHBOARD.md` 自动生成：当前进度、必须处理、禁止出现、待处理问题、可直接输入的操作
-2. `story/views/hook_dashboard.md` 伏笔看板 + 角色知识边界矩阵 + 时间线冲突检查（脚本自动生成）
+> 详细设计见 `/home/kerlewor/codex-safe/books/_frameworks/v0.3.0改进路线图`
 
-**共创审查与润色：**
-3. 作者原稿导入 + 全文分段审阅（取消截断、分块处理、段落 ID 锚定）
-4. `story/runtime/chapter-XXXX.polish-diff.md` 结构化 diff 报告 + 按编号接受/拒绝修改
-5. 润色全章节奏保护：自动读取导演表 `style_arc`，约束局部 Polish 服从整体语言曲线
+**核心目标：** 将 v0.3.0 的 25 个独立脚本抽象为可复用的 `core/` 模块，新建统一 CLI 入口，封装模型调用接口（摆脱对 Claude Code/Codex 的硬依赖），最终通过 PyInstaller 打包为无需 Python 环境的可执行程序。
 
-**场景编排与角色：**
-6. 场景卡 Markdown 模板 + 自然语言编辑（"将场景 2 移到场景 1 之前"）
-7. 角色声音实验室（同一句话 × 不同角色对比输出）
+**架构变更：**
+- 新增 `core/` — 10+ 个纯 Python 模块（project/chapter/context/ledger/hooks/style/knowledge/doctor/gatekeeper/providers）
+- 新增 `cli/` — 统一 CLI 入口（`nw project create`, `nw chapter run`, `nw hook report` 等）
+- 新增 `core/providers/` — 模型调用抽象层（Anthropic + OpenAI + DeepSeek）
+- `scripts/` 保留为 thin wrapper（Agent 用户零影响）
 
-**全章统筹闭环：**
-8. 章节双循环工作流（内循环：场景完成 → 轻量检查 → 接力卡 → 下一场景；外循环：合并 → 全章审查 → 局部修订 → 节奏复核 → 定稿）
-9. 不同长度章节自动匹配差异化策略（3000/6000/10000 字三档，万字以上强制导演表与接力卡）
-10. 正式提交后自动同步结构化账本 + 更新状态
-
-**扩展：**
-11. 版本管理与分支试写（`chapter_019/` 目录 + decision_log.md）
-12. 文笔拆解训练模块
-
-**Markdown 是作者可读、Git 可追踪的正式载体。所有"看板"和"控制台"都是脚本自动生成的 Markdown 文件。章节双循环工作流不依赖新界面，而是由脚本 + Agent + 自然语言命令驱动。到了 v0.4 末期，如果 Markdown 工作台确实无法满足需求，再评估是否需要 Web UI 或 TUI。**
+**向后兼容：** Claude Code / Codex Agent 用户的所有命令和路径不变。`scripts/` 内部改为 `from core import ...` 委托调用。
 
 ---
 

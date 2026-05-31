@@ -368,7 +368,7 @@ AI:   [decompose_style.py --input chapters/drafts/chapter-0001.author.md] →
 
 ## 更新计划
 
-当前版本：**v0.3.0**。v0.2.0 为全面运行时升级。v0.3.0 已完成 Context Engine 重构与平台原生化，后续 **v0.4.0** 将交付 Markdown-native 作者工作台体验。
+当前版本：**v0.3.0**。v0.2.0 为全面运行时升级。v0.3.0 已完成 Context Engine 重构与平台原生化，后续 **v0.4.0** 将聚焦核心引擎封装与统一 CLI 入口，为独立可执行程序和本地 Web 界面铺路。
 
 详细路线图见 **[ROADMAP.md](ROADMAP.md)**（约 600 行，涵盖核心诊断、版本路线、难度评估、产品定位与实现方案）。
 
@@ -378,11 +378,11 @@ AI:   [decompose_style.py --input chapters/drafts/chapter-0001.author.md] →
 |---|---|---|---|
 | **v0.2.2** | 正确性修复 | prompt_compiler bug 修复、Context Builder 精准筛选、5000 字符截断修复（已在 v0.3.0 中完成） | ✅ 已完成 |
 | **v0.3** | 平台原生化 + Context Engine | CLAUDE.md 精简/AGENTS.md 新增、结构化账本（JSONL+Views）、Relevance Resolver、Skills 同步、章节导演表+接力卡 | ✅ 已完成 |
-| **v0.4** | 作者体验增强 | 伏笔看板、段落级 diff、章节双循环工作流、角色声音实验室、版本管理、文笔拆解 | 计划中 |
+| **v0.4** | 核心引擎封装 + 统一入口 | core/ 模块体系、CLI 统一入口（nw 命令）、模型调用抽象层（Anthropic/OpenAI/DeepSeek）、PyInstaller 打包、PyPI 发布 | 计划中 |
 
 ### 产品定位
 
-Narrative Workbench 将保持为**运行在 Claude Code 与 Codex 之上的平台原生小说工作流包**，而非独立应用。Claude Code 和 Codex 已是交互界面——项目负责记忆、检索、审查、约束和版本管理，平台负责交互。详见 [ROADMAP.md §八](ROADMAP.md)。
+v0.3.0 完成了平台原生化（Claude Code + Codex 双入口）。v0.4.0 将在保留 Agent 用户兼容入口的同时，通过 `core/` 模块封装和 CLI 统一入口，让项目可以脱离 Claude Code/Codex 独立运行——最终以 PyInstaller 打包的可执行文件和 PyPI 包两种形式分发。详见 [ROADMAP.md](ROADMAP.md)。
 
 ## 深入阅读
 
