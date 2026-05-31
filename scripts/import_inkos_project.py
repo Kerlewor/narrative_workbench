@@ -11,13 +11,14 @@ Usage:
 """
 
 from __future__ import annotations
+from _project import add_root_argument, get_root
 
 import argparse
 import shutil
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT: Path = Path.cwd()  # Set in main() via --project-root or CWD
 
 FILE_MAP: list[tuple[str, str, str]] = [
     ("current_state.md", "story/current_state.md", "直接映射"),
@@ -91,10 +92,13 @@ def import_project(source: str, dry_run: bool = False) -> dict:
 
 
 def main() -> int:
+    global ROOT
     parser = argparse.ArgumentParser(description="InkOS Project Importer")
+    add_root_argument(parser)
     parser.add_argument("source", type=str, help="InkOS 项目目录路径")
     parser.add_argument("--dry-run", action="store_true", help="仅预览，不实际复制文件")
     args = parser.parse_args()
+    ROOT = get_root(args)
 
     result = import_project(args.source, args.dry_run)
 

@@ -20,7 +20,9 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-ROOT = Path(__file__).resolve().parents[1]
+from _project import add_root_argument, get_root
+
+ROOT: Path = Path.cwd()  # Set in main() via --project-root or CWD
 
 AGENT_BUDGETS = {
     "writer": 18000,
@@ -123,10 +125,141 @@ def read_summary(path: Path, max_lines: int = 40) -> str:
     return "\n".join(lines[:max_lines]) + f"\n\n... (共 {len(lines)} 行，已截断)"
 
 
+def _extract_yaml_list(text: str, key: str) -> list[str]:
+    """Extract a YAML list from frontmatter or inline YAML block."""
+    import re
+    pattern = rf'{key}:\s*\n?((?:\s+-.*\n?)*)'
+    match = re.search(pattern, text)
+    if not match:
+        pattern_inline = rf'{key}:\s*\[(.*?)\]'
+        match_inline = re.search(pattern_inline, text)
+        if match_inline:
+            return [v.strip().strip('"').strip("'") for v in match_inline.group(1).split(",")]
+        return []
+    items = re.findall(r'\s+-\s+(.+)', match.group(1))
+    return [item.strip().strip('"').strip("'") for item in items]
+
+
+def _get_chapter_cast_ids(chapter: int) -> list[str]:
+    """Extract cast_ids from chapter plan frontmatter, if available."""
+    prefix = chapter_prefix(chapter)
+    # Check runtime markdown plans first
+    for suffix in ["plan", "intent"]:
+        path = ROOT / "story/runtime" / f"{prefix}.{suffix}.md"
+        if path.is_file():
+            text = path.read_text(encoding="utf-8")
+            cast = _extract_yaml_list(text, "cast_ids")
+            if cast:
+                return cast
+    # Check YAML director sheets
+    for ext in ["yaml", "yml"]:
+        path = ROOT / "story/plans" / f"{prefix}_director_sheet.{ext}"
+        if path.is_file():
+            text = path.read_text(encoding="utf-8")
+            cast = _extract_yaml_list(text, "cast_ids")
+            if cast:
+                return cast
+    return []
+
+
+def _extract_chapter_summary(summary_text: str, chapter_num: int) -> str:
+    """Extract a specific chapter's summary from chapter_summaries.md."""
+    import re
+    lines = summary_text.splitlines()
+    target_prefixes = [
+        f"第{chapter_num}章", f"第 {chapter_num} 章",
+        f"第{chapter_num:02d}章", f"第 {chapter_num:02d} 章",
+        f"Chapter {chapter_num}", f"chapter {chapter_num}",
+        f"Chapter {chapter_num:02d}", f"chapter {chapter_num:02d}",
+        f"## 第{chapter_num}章", f"## Chapter {chapter_num}",
+        f"## 第{chapter_num:02d}章",
+        f"### 第{chapter_num}章", f"### Chapter {chapter_num}",
+    ]
+    start_idx = None
+    for i, line in enumerate(lines):
+        for prefix in target_prefixes:
+            if line.strip().startswith(prefix) or prefix in line:
+                start_idx = i
+                break
+        if start_idx is not None:
+            break
+
+    if start_idx is None:
+        # Try table row format: | N | Title | Cast | Events | ...
+        for i, line in enumerate(lines):
+            line = line.strip()
+            if line.startswith("|") and not line.startswith("|---"):
+                cells = [c.strip() for c in line.strip("|").split("|")]
+                if cells and cells[0].isdigit() and int(cells[0]) == chapter_num:
+                    return line
+        # Last resort: return last 40 lines
+        return f"(未找到第{chapter_num}章摘要标记，返回文件尾部)\n\n" + "\n".join(lines[-40:])
+
+    end_idx = None
+    for i in range(start_idx + 1, len(lines)):
+        line = lines[i].strip()
+        # Heading-based boundary: ## 第N章, ### Chapter N, etc.
+        if re.match(r'^#+\s*第?\d+章', line) or re.match(r'^#+\s*Chapter\s*\d+', line):
+            end_idx = i
+            break
+        # Table row boundary: | N | Title | ... where N is a new chapter number
+        if line.startswith("|") and not line.startswith("|---"):
+            cells = [c.strip() for c in line.strip("|").split("|")]
+            if cells and cells[0].isdigit():
+                end_idx = i
+                break
+
+    if end_idx is None:
+        end_idx = min(start_idx + 60, len(lines))
+
+    return "\n".join(lines[start_idx:end_idx])
+
+
+def _filter_hooks_by_relevance(hooks_text: str, chapter: int, cast_ids: list[str]) -> str:
+    """Filter hooks relevant to the current chapter. Falls back to full text if unparseable."""
+    import re
+
+    lines = hooks_text.splitlines()
+    relevant: list[str] = []
+    header_lines: list[str] = []
+    # Build word-boundary patterns for cast_ids
+    cast_patterns = [re.compile(r'\b' + re.escape(cid) + r'\b', re.IGNORECASE) for cid in cast_ids if cid]
+    ch_str = str(chapter)
+    prev_ch_str = str(chapter - 1)
+
+    for line in lines:
+        if line.startswith("|") and "HOOK" in line:
+            cells = [c.strip() for c in line.strip("|").split("|")]
+            is_match = False
+            for cell in cells:
+                for pat in cast_patterns:
+                    if pat.search(cell):
+                        is_match = True
+                        break
+                if not is_match and (re.search(r'\b' + re.escape(ch_str) + r'\b', cell) or re.search(r'\b' + re.escape(prev_ch_str) + r'\b', cell)):
+                    is_match = True
+                if is_match:
+                    break
+            if is_match or not relevant:
+                relevant.append(line)
+        elif line.startswith("#") or line.startswith("|"):
+            header_lines.append(line)
+        elif relevant:
+            relevant.append(line)
+
+    if len(relevant) <= 5:
+        return "\n".join(lines[:80])
+
+    return "\n".join(header_lines + relevant)
+
+
 def collect_must_include(agent: str, chapter: int) -> dict[str, str]:
     result: dict[str, str] = {}
     prefix = chapter_prefix(chapter)
     prev_prefix = chapter_prefix(chapter - 1) if chapter > 1 else None
+
+    # Resolve cast_ids once for character + hook filtering
+    cast_ids = _get_chapter_cast_ids(chapter)
 
     for item in MUST_INCLUDE.get(agent, []):
         if item == "intent":
@@ -136,19 +269,36 @@ def collect_must_include(agent: str, chapter: int) -> dict[str, str]:
             path = find_runtime_file("plan", chapter)
             result["plan"] = read_file(path) if path else "(plan 文件不存在)"
         elif item == "previous_chapter_summary":
-            summary_path = ROOT / "story/chapter_summaries.md"
-            result["previous_chapter_summary"] = read_summary(summary_path)
+            if prev_prefix:
+                summary_path = ROOT / "story/chapter_summaries.md"
+                full_text = summary_path.read_text(encoding="utf-8") if summary_path.is_file() else ""
+                result["previous_chapter_summary"] = _extract_chapter_summary(full_text, chapter - 1) if full_text else "(摘要文件不存在)"
+            else:
+                result["previous_chapter_summary"] = "(第1章无前章摘要)"
         elif item == "active_character_cards":
             roles_dir = ROOT / "story/roles"
             cards = []
-            for card in sorted(roles_dir.glob("*.md")):
-                if card.name.startswith("_template"):
-                    continue
-                cards.append(f"--- {card.stem} ---\n{read_summary(card, 60)}")
+            if cast_ids:
+                for cid in cast_ids:
+                    card_path = roles_dir / f"{cid}.md"
+                    if card_path.is_file():
+                        cards.append(f"--- {card_path.stem} (cast) ---\n{read_summary(card_path, 60)}")
+                    else:
+                        cards.append(f"--- {cid} ---\n(角色卡文件不存在: {cid}.md)")
+            else:
+                # Fallback: include all but mark as unfiltered
+                for card in sorted(roles_dir.glob("*.md")):
+                    if card.name.startswith("_template"):
+                        continue
+                    cards.append(f"--- {card.stem} (unfiltered) ---\n{read_summary(card, 60)}")
             result["active_character_cards"] = "\n\n".join(cards) if cards else "(无角色卡)"
         elif item == "active_hooks":
             hooks_path = ROOT / "story/pending_hooks.md"
-            result["active_hooks"] = read_summary(hooks_path, 80)
+            if hooks_path.is_file():
+                hooks_text = hooks_path.read_text(encoding="utf-8")
+                result["active_hooks"] = _filter_hooks_by_relevance(hooks_text, chapter, cast_ids)
+            else:
+                result["active_hooks"] = "(伏笔文件不存在)"
         elif item == "writer_draft":
             path = find_runtime_file("writer", chapter)
             if path and path.is_file():
@@ -175,7 +325,11 @@ def collect_must_include(agent: str, chapter: int) -> dict[str, str]:
             result["style_blacklist"] = read_summary(sb, 60) if sb.is_file() else "(未设置)"
         elif item == "pending_hooks":
             ph = ROOT / "story/pending_hooks.md"
-            result["pending_hooks"] = read_summary(ph, 80) if ph.is_file() else "(无伏笔)"
+            if ph.is_file():
+                hooks_text = ph.read_text(encoding="utf-8")
+                result["pending_hooks"] = _filter_hooks_by_relevance(hooks_text, chapter, cast_ids)
+            else:
+                result["pending_hooks"] = "(无伏笔)"
         elif item == "emotional_arcs":
             ea = ROOT / "story/emotional_arcs.md"
             result["emotional_arcs"] = read_summary(ea, 60) if ea.is_file() else "(无弧光记录)"
@@ -370,7 +524,9 @@ def build_context(agent: str, chapter: int) -> str:
 
 
 def main() -> int:
+    global ROOT
     parser = argparse.ArgumentParser(description="Context Builder for Narrative Workbench")
+    add_root_argument(parser)
     parser.add_argument("--chapter", type=int, required=True, help="章节编号")
     parser.add_argument("--agent", type=str, required=True,
                         choices=["writer", "polish", "review", "fixer", "librarian"],
@@ -378,6 +534,7 @@ def main() -> int:
     parser.add_argument("--output", type=str, default=None,
                         help="输出路径（默认 story/runtime/chapter-XXXX.<agent>.context.md）")
     args = parser.parse_args()
+    ROOT = get_root(args)
 
     context = build_context(args.agent, args.chapter)
 

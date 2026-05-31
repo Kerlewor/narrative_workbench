@@ -7,13 +7,14 @@ Usage:
 """
 
 from __future__ import annotations
+from _project import add_root_argument, get_root
 
 import argparse
 import re
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT: Path = Path.cwd()  # Set in main() via --project-root or CWD
 REGISTRY = ROOT / "skills/skill_registry.md"
 VALID_STATUSES = {"enabled", "disabled", "deprecated"}
 EXPECTED_HEADER = ["skill", "用途", "触发条件", "入口文件/说明", "输出位置", "状态"]
@@ -41,9 +42,12 @@ def extract_paths(value: str) -> list[str]:
 
 
 def main() -> int:
+    global ROOT
     parser = argparse.ArgumentParser()
+    add_root_argument(parser)
     parser.add_argument("--skill", help="require a specific skill to be registered")
     args = parser.parse_args()
+    ROOT = get_root(args)
 
     errors: list[str] = []
     warnings: list[str] = []
@@ -81,7 +85,7 @@ def main() -> int:
         if not paths:
             warnings.append(f"{skill}: entry file/description has no explicit path")
         for rel in paths:
-            if rel.startswith("skills/") and not (ROOT / rel).is_file():
+            if not (ROOT / rel).is_file():
                 errors.append(f"{skill}: entry file missing: {rel}")
 
     if args.skill and args.skill not in seen:

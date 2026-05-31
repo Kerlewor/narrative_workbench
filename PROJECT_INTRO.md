@@ -13,28 +13,33 @@
 - Writer / Polish / Review / Fixer 职责混乱。
 - Claude Code subagent、Python 检查脚本、skills 扩展之间缺少统一接口。
 
-本框架的核心思想是：**主模型负责调度和判断，subagent 负责分工处理，Python 负责确定性检查（19 个脚本），状态文件负责长期记忆。** v0.2.0 在 v0.1.0 基础上新增了上下文编译、确定性门禁、知识库索引、文风分析、角色漂移检测、文风拆解、共创模式辅助和 Python 环境降级方案。
+本框架的核心思想是：**主模型负责调度和判断，subagent 负责分工处理，Python 负责确定性检查（25 个脚本），状态文件负责长期记忆。** v0.2.0 在 v0.1.0 基础上新增了上下文编译、确定性门禁、知识库索引、文风分析、角色漂移检测、文风拆解、共创模式辅助和 Python 环境降级方案。
 
 ## 2. 系统架构
 
 ```text
-用户
+用户 (自然语言命令)
   ↓
-主模型 / 主会话
-  ├─ 读取 CLAUDE.md / RUN_RULES.md / system_protocol.md
-  ├─ 检测 Python 环境（有则用脚本，无则手动等效）
-  ├─ 调用 Project Librarian 生成 Context Packet
-  ├─ 搭建大纲 / 导入现成大纲 / 深化角色
-  ├─ 调度四 Agent（context_builder → prompt_compiler → Agent 执行）
-  ├─ 运行 gatekeeper 确定性门禁
-  ├─ final-check
-  └─ 提交 canonical 状态
-        ↓
-Writer → Polish → Review → Fixer
-        ↓
-story/runtime/ working 文件（含 context / prompt / gatekeeper 产物）
-        ↓
-chapters/ + story/*.md + story/state/*.json
+第三层：平台适配层
+  ├─ CLAUDE.md / AGENTS.md — 平台入口（核心路由）
+  ├─ .claude/skills/ + .agents/skills/ — 原生 Skills 入口
+  └─ .codex/ — Codex Agent + hooks
+  ↓
+第二层：确定性脚本层 (平台无关)
+  ├─ relevance_resolver.py — 精确上下文注入（替代 context_builder 核心）
+  ├─ ledger_manager.py + render_views.py — 结构化账本 + 可读视图
+  ├─ director_sheet.py — 章节导演表
+  ├─ gatekeeper.py — 确定性门禁
+  └─ 其余 18 个脚本 — 体检、索引、审计、文风、迁移
+  ↓
+第一层：小说项目核心数据层 (平台无关)
+  ├─ chapters/ + story/outline/ — 正式正文与大纲 (canonical)
+  ├─ story/ledger/ — 结构化事实账本 (JSONL, 7类)
+  ├─ story/views/ — 作者可读 Markdown 视图
+  ├─ story/plans/ — 章节导演表 (YAML)
+  ├─ story/roles/ — 角色卡 (canonical)
+  ├─ story/runtime/ — 临时任务包与审阅结果 (working)
+  └─ story/state/ — JSON 状态镜像
 ```
 
 ### 主模型职责
@@ -58,7 +63,7 @@ chapters/ + story/*.md + story/state/*.json
 
 ### Python 职责
 
-19 个 Python 脚本不参与创作判断，只做确定性工作：
+25 个 Python 脚本不参与创作判断，只做确定性工作：
 
 - 文件完整性、JSON 合法性、frontmatter 格式检查（doctor.py）
 - 章节索引生成（chapter_index.py）
@@ -80,18 +85,25 @@ chapters/ + story/*.md + story/state/*.json
 ## 3. 目录结构
 
 ```text
-CLAUDE.md              主启动协议
-START_HERE.md          给 AI 的简短启动指令
-RUN_RULES.md           Python 辅助脚本运行门禁
-PROJECT_INTRO.md       本项目介绍
-SYSTEM_AUDIT.md        系统论审计记录
+CLAUDE.md / AGENTS.md     Claude Code / Codex 入口协议（核心路由）
+START_HERE.md             给 AI 的简短启动指令
+RUN_RULES.md              Python 辅助脚本运行门禁
+PROJECT_INTRO.md          本项目介绍
 
-.claude/agents/        Claude Code 可发现的 subagent 注册文件
-agents/                Project Librarian 与四 Agent 的详细职责提示词
-chapters/              正文章节目录
-scripts/               Python 辅助脚本
-skills/                可插拔 skill 接口和注册表
-story/                 大纲、状态、风格、伏笔、runtime 工作区
+workflow/                 系统原则与章节生命周期
+.claude/agents/           Claude Code subagent 注册（薄路由层）
+.claude/skills/           Claude Code 原生 Skills 入口
+.agents/skills/           Codex 原生 Skills 入口
+.codex/                   Codex Agent 注册 + hooks.json
+agents/                   各 Agent 详细职责 prompt
+chapters/                 正文章节目录
+scripts/                  25 个 Python 辅助脚本
+skills/                   可插拔 skill 接口和注册表（正式来源）
+story/                    大纲、状态、风格、伏笔、runtime 工作区
+  ledger/                 结构化事实账本（JSONL，7 类）
+  views/                  作者可读 Markdown 视图
+  plans/                  章节导演表（YAML）
+tests/                    回归测试
 ```
 
 ## 4. 启动方式
@@ -338,13 +350,16 @@ candidate → open → progressing → escalated → resolved / dormant / droppe
 
 - `RUN_RULES.md`
 
-脚本位于 `scripts/`，共 19 个，分为五组：
+脚本位于 `scripts/`，共 25 个，分为八组：
 
 | 组 | 脚本 |
 |---|---|
 | 体检与索引 | `doctor.py` / `chapter_index.py` / `status.py` |
 | Hook 审计 | `hook_report.py` / `hook_matrix.py` |
-| 上下文与门禁 | `context_builder.py` / `prompt_compiler.py` / `gatekeeper.py` |
+| 上下文引擎 | `relevance_resolver.py` / `context_builder.py` / `prompt_compiler.py` / `gatekeeper.py` |
+| 账本与视图 | `ledger_manager.py` / `render_views.py` |
+| 章节统筹 | `director_sheet.py` |
+| 平台适配 | `sync_skills.py` |
 | 文风与角色 | `style_report.py` / `character_drift_report.py` / `decompose_style.py` / `text_audit.py` |
 | 知识与迁移 | `knowledge_index.py` / `import_inkos_project.py` / `structure_report.py` / `skill_check.py` |
 | 共创辅助 | `review_author_chapter.py` / `polish_author_chapter.py` / `create_project.py` |

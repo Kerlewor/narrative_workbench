@@ -38,7 +38,7 @@ Narrative Workbench 是一个受 InkOS 启发的独立 Markdown-native 实现。
 - **v0.2.0 共创与兼容：** `review_author_chapter.py` / `polish_author_chapter.py`（共创模式简报生成）、`import_inkos_project.py`（InkOS 项目迁移器）。
 - **Python 环境降级方案：** 无 Python 时 AI 手动执行等效检查，产物标注 `(manual)`。
 - **共创模式：** 审查第N章 / 润色第N章（5种模式）/ 第N章写作简报——作者手写 + AI 辅助。
-- **所有 Python 辅助脚本（19 个）** 和 **所有 Prompt 文本与模板** 均为独立编写。
+- **所有 Python 辅助脚本（25 个）** 和 **所有 Prompt 文本与模板** 均为独立编写。
 
 ## 架构对比
 
@@ -47,11 +47,11 @@ Narrative Workbench 是一个受 InkOS 启发的独立 Markdown-native 实现。
 | **平台** | TypeScript CLI（npm 包） | Markdown prompt 框架（Claude Code/Codex CLI） |
 | **Agent 模型** | 10 Agent，3 阶段（创作→结算→质量） | 5 Agent，4 阶段流水线 + 独立上下文路由 |
 | **Agent 名称** | Radar、Planner、Composer、Architect、Writer、Observer、Reflector、Normalizer、Auditor、Reviser | Project Librarian、Writer、Polish、Review、Fixer |
-| **状态后端** | Markdown 真相文件 + SQLite + Zod schema 校验 | Markdown 账本 + JSON 镜像 + 19 个 Python 脚本 |
+| **状态后端** | Markdown 真相文件 + SQLite + Zod schema 校验 | Markdown 账本 + JSON 镜像 + JSONL 结构化账本 + 25 个 Python 脚本 |
 | **Agent 会话** | 无状态（每章新调用） | 持久会话（跨章存活，8 章重置阈值） |
 | **上下文管理** | Composer Agent 按相关性选取上下文 | 持久会话基线 + context_builder + prompt_compiler |
 | **流水线控制** | CLI 命令（`inkos write next`） | 主会话编排 + gatekeeper 门禁 + CLAUDE.md 协议 |
-| **确定性检查** | 内嵌 TypeScript 逻辑 | 19 个独立 Python 脚本（无 Python 时 AI 手动等效） |
+| **确定性检查** | 内嵌 TypeScript 逻辑 | 25 个独立 Python 脚本（无 Python 时 AI 手动等效） |
 | **写作模式** | 全自动流水线 | 流水线模式 + 共创模式（作者手写 + AI 辅助） |
 
 ## 许可证兼容性

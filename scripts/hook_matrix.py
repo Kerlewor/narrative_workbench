@@ -9,6 +9,7 @@ Usage:
 """
 
 from __future__ import annotations
+from _project import add_root_argument, get_root
 
 import argparse
 import re
@@ -16,7 +17,7 @@ from collections import defaultdict, deque
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT: Path = Path.cwd()  # Set in main() via --project-root or CWD
 HOOKS_PATH = ROOT / "story/pending_hooks.md"
 
 ACTIVE = {"open", "progressing", "escalated", "dormant"}
@@ -75,9 +76,12 @@ def detect_cycles(graph: dict[str, list[str]]) -> list[list[str]]:
 
 
 def main() -> int:
+    global ROOT
     parser = argparse.ArgumentParser()
+    add_root_argument(parser)
     parser.add_argument("--current", type=int, required=True, help="current finalized chapter")
     args = parser.parse_args()
+    ROOT = get_root(args)
 
     header, rows = parse_table()
     print(f"hook matrix: current chapter {args.current}")

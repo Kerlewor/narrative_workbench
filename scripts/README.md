@@ -273,6 +273,76 @@ python3 scripts/polish_author_chapter.py --chapter 12 --mode anti-ai
 - 脚本生成结构化任务包，不调用 AI 模型、不自动改写正文。真正的润色由 Claude Code/Codex 的 Polish Agent 完成。
 - 产物路径：`story/runtime/chapter-XXXX.author_polish_<mode>.md`
 
+## relevance_resolver.py
+
+```bash
+python3 scripts/relevance_resolver.py --chapter 12 --agent writer
+python3 scripts/relevance_resolver.py --chapter 12 --agent review
+```
+
+用途：
+
+- **v0.3 上下文引擎核心。** 根据章节计划的 cast_ids/hook_ids/secret_ids 从结构化账本精确检索相关事实。
+- 为 Writer/Polish/Review/Fixer/Librarian 构建不同预算的差异化任务包。
+- 每条注入信息标注原因，省略的信息标注省略原因。
+- 产物路径：`story/runtime/chapter-XXXX.<agent>.resolved.md`
+
+## ledger_manager.py
+
+```bash
+python3 scripts/ledger_manager.py init
+python3 scripts/ledger_manager.py add hooks '{"id":"HOOK_001",...}'
+python3 scripts/ledger_manager.py query hooks --filter 'status=="open"'
+python3 scripts/ledger_manager.py validate
+```
+
+用途：
+
+- 管理 7 类结构化小说账本（facts/hooks/timeline/characters/relationships/secrets/locations）。
+- 支持 CRUD、schema 验证、过滤器查询和从章节导演表提取事实。
+- 产物路径：`story/ledger/*.jsonl`
+
+## render_views.py
+
+```bash
+python3 scripts/render_views.py all
+python3 scripts/render_views.py hooks
+```
+
+用途：
+
+- 将 JSONL 账本渲染为作者可读的 Markdown 视图（伏笔看板、知识边界矩阵、时间线、关系网络）。
+- 产物路径：`story/views/*.md`
+
+## director_sheet.py
+
+```bash
+python3 scripts/director_sheet.py --chapter 19 --from-template
+python3 scripts/director_sheet.py --chapter 19 --validate
+```
+
+用途：
+
+- 生成章节导演表（全章蓝图：情绪曲线、信息释放计划、语言节奏、场景接力链）。
+- 支持从模板生成和从已有 intent/plan 提取。
+- `--validate` 检查导演表完整性。
+- 产物路径：`story/plans/chapter-NNNN_director_sheet.yaml`
+
+## sync_skills.py
+
+```bash
+python3 scripts/sync_skills.py
+python3 scripts/sync_skills.py --dry-run
+python3 scripts/sync_skills.py --clean
+```
+
+用途：
+
+- 将 `skills/`（唯一正式来源）同步到平台原生 Skills 入口包装。
+- 生成 `.claude/skills/`（Claude Code）和 `.agents/skills/`（Codex）。
+- 同时生成 `.codex/agents/` 和 `.codex/hooks.json`。
+- `--dry-run` 预览不写入，`--clean` 清除已废弃的包装文件。
+
 ## 边界
 
 这些脚本只做确定性辅助，不做创作判断。不要用脚本自动总结章节、自动回收 hook、自动润色正文或自动调度 Agent。审查和润色脚本生成的是结构化任务包，不调用 AI 模型。

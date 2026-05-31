@@ -15,6 +15,7 @@ Output:
 """
 
 from __future__ import annotations
+from _project import add_root_argument, get_root
 
 import argparse
 import json
@@ -23,7 +24,7 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT: Path = Path.cwd()  # Set in main() via --project-root or CWD
 INDEX_DIR = ROOT / ".nw_index"
 ENTITY_INDEX_PATH = INDEX_DIR / "entity_index.json"
 
@@ -203,12 +204,14 @@ def cmd_query(args: argparse.Namespace) -> int:
 
 
 def main() -> int:
+    global ROOT
     parser = argparse.ArgumentParser(description="Knowledge Index for Narrative Workbench")
     sub = parser.add_subparsers(dest="command", help="build | query")
 
     build_parser = sub.add_parser("build", help="扫描项目文件并构建索引")
 
     query_parser = sub.add_parser("query", help="查询知识库索引")
+    add_root_argument(parser)
     query_parser.add_argument("--keyword", type=str, default=None, help="检索关键词")
     query_parser.add_argument("--domain", type=str, default=None, help="领域筛选")
     query_parser.add_argument("--chapter", type=int, default=0, help="生成知识包的目标章节")
@@ -216,6 +219,7 @@ def main() -> int:
     query_parser.add_argument("--output", type=str, default=None, help="输出路径")
 
     args = parser.parse_args()
+    ROOT = get_root(args)
 
     if args.command == "build":
         return cmd_build()

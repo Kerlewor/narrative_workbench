@@ -12,6 +12,7 @@ Usage:
 """
 
 from __future__ import annotations
+from _project import add_root_argument, get_root
 
 import argparse
 import json
@@ -19,7 +20,7 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT: Path = Path.cwd()  # Set in main() via --project-root or CWD
 
 
 def analyze_pov(text: str) -> str:
@@ -162,10 +163,13 @@ def build_skill(text: str) -> str:
 
 
 def main() -> int:
+    global ROOT
     parser = argparse.ArgumentParser(description="Style Decomposer")
+    add_root_argument(parser)
     parser.add_argument("--input", type=str, required=True, help="输入文本路径")
     parser.add_argument("--output-dir", type=str, default=None, help="输出目录")
     args = parser.parse_args()
+    ROOT = get_root(args)
 
     input_path = Path(args.input)
     if not input_path.is_file():
@@ -179,6 +183,7 @@ def main() -> int:
     profile = build_profile(text)
     skill_md = build_skill(text)
 
+    out_dir.mkdir(parents=True, exist_ok=True)
     report_path = out_dir / "style_analysis.md"
     profile_path = out_dir / "style_profile.json"
     skill_path = out_dir / "style_skill.md"

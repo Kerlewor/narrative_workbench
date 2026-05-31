@@ -39,7 +39,7 @@
 | 注册或修改 skill 后 | `python3 scripts/skill_check.py`、`python3 scripts/doctor.py` | skill request 或修改说明 |
 | 规划第 N 章前 | `python3 scripts/hook_report.py --current N-1`、`python3 scripts/hook_matrix.py --current N-1` | `chapter-000N.intent.md` 的 Hook 预算 |
 | 批量规划前 | `python3 scripts/doctor.py`、`python3 scripts/hook_report.py --current N-1`、`python3 scripts/hook_matrix.py --current N-1`、`python3 scripts/structure_report.py` | `batch-000N-000M.plan.md` |
-| Writer 前 | 建议 `python3 scripts/context_builder.py --chapter N --agent writer` + `python3 scripts/prompt_compiler.py --chapter N --agent writer`；必须读取 intent / plan / hook_protocol | `chapter-000N.writer.md` handoff |
+| Writer 前 | 建议 `python3 scripts/relevance_resolver.py --chapter N --agent writer`（优先）或 `python3 scripts/context_builder.py --chapter N --agent writer` + `python3 scripts/prompt_compiler.py --chapter N --agent writer`；必须读取 intent / plan / hook_protocol | `chapter-000N.writer.md` handoff |
 | Polish 前 | 建议 `python3 scripts/context_builder.py --chapter N --agent polish` + `python3 scripts/prompt_compiler.py --chapter N --agent polish`；必须读取 style_profile / style_guide | `chapter-000N.polish.md` handoff |
 | Review 前 | 建议 `python3 scripts/context_builder.py --chapter N --agent review` + `python3 scripts/prompt_compiler.py --chapter N --agent review`；若已有候选正文文件，运行 `python3 scripts/text_audit.py <候选正文路径>` | `chapter-000N.review.md` |
 | Fixer 前 | 建议 `python3 scripts/context_builder.py --chapter N --agent fixer` + `python3 scripts/prompt_compiler.py --chapter N --agent fixer` | `chapter-000N.fixer.md` handoff |
@@ -48,6 +48,10 @@
 | 批末审计 | `python3 scripts/doctor.py`、`python3 scripts/chapter_index.py --check`、`python3 scripts/hook_report.py --current M`、`python3 scripts/hook_matrix.py --current M`、`python3 scripts/structure_report.py` | `batch-000N-000M.audit.md` |
 | 进入新卷前 | `python3 scripts/structure_report.py`、`python3 scripts/hook_matrix.py --current N`、`python3 scripts/doctor.py` | `story/current_focus.md` 和新卷 plan |
 | 手动改状态文件后 | `python3 scripts/doctor.py`、必要时 `python3 scripts/structure_report.py` | 修改说明或 drift check |
+| 初始化账本 | `python3 scripts/ledger_manager.py init` + `python3 scripts/ledger_manager.py validate` | `story/ledger/*.jsonl` |
+| 更新视图 | `python3 scripts/render_views.py all` | `story/views/*.md` |
+| 同步 Skills | `python3 scripts/sync_skills.py` | `.claude/skills/` + `.agents/skills/` |
+| 章节导演表 | `python3 scripts/director_sheet.py --chapter N --from-template` | `story/plans/chapter_NNNN_director_sheet.yaml` |
 
 ## 脚本职责
 
@@ -72,6 +76,11 @@
 | `import_inkos_project.py` | 将 InkOS 项目文件映射迁移到 Narrative Workbench | 处理语义不兼容内容 |
 | `review_author_chapter.py` | 为手写章节生成 Review 审查简报（共创模式） | 替代 Review Agent |
 | `polish_author_chapter.py` | 为手写章节生成 Polish 润色简报（共创模式，5 种模式） | 替代 Polish Agent |
+| `relevance_resolver.py` | 精确相关性上下文注入 — 根据章节 plan 的 cast_ids/hook_ids/secret_ids 从账本检索，为不同 Agent 构建差异化任务包 | 替代 context_builder 核心逻辑 |
+| `ledger_manager.py` | 管理结构化小说账本（JSONL CRUD + 验证 + 抽取） | 替代手动维护 Markdown 状态 |
+| `render_views.py` | 从 JSONL 账本渲染作者可读 Markdown 视图 | 不做语义分析 |
+| `director_sheet.py` | 生成和验证章节导演表 | 不做创作决策 |
+| `sync_skills.py` | 将 skills/ 同步到 .claude/skills/ 和 .agents/skills/ 平台入口 | 不维护重复内容 |
 
 ## 失败处理
 

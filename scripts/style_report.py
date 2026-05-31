@@ -13,6 +13,7 @@ Output:
 """
 
 from __future__ import annotations
+from _project import add_root_argument, get_root
 
 import argparse
 import re
@@ -20,7 +21,7 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT: Path = Path.cwd()  # Set in main() via --project-root or CWD
 
 AI_PATTERNS = [
     (r"某种难以言说的", "AI 味: 抽象情绪短语"),
@@ -95,7 +96,7 @@ def analyze_text(text: str) -> dict:
 
 def build_report(chapter: int, input_path: Optional[str] = None) -> str:
     if input_path:
-        path = Path(input_path)
+        path = Path(input_path).resolve()
     else:
         path = find_chapter_file(chapter)
 
@@ -170,11 +171,14 @@ def build_report(chapter: int, input_path: Optional[str] = None) -> str:
 
 
 def main() -> int:
+    global ROOT
     parser = argparse.ArgumentParser(description="Style Report for Narrative Workbench")
+    add_root_argument(parser)
     parser.add_argument("--chapter", type=int, default=0, help="章节编号")
     parser.add_argument("--input", type=str, default=None, help="直接指定文件路径")
     parser.add_argument("--output", type=str, default=None)
     args = parser.parse_args()
+    ROOT = get_root(args)
 
     report = build_report(args.chapter, args.input)
 

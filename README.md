@@ -2,7 +2,7 @@
 
 面向 Claude Code 与 Codex CLI 的长篇 AI 小说工程框架。为长篇小说提供状态管理、伏笔追踪、角色一致性审查、文风对齐和 AI 辅助流水线——不是替作者写完一本书，而是让作者把小说创作当成工程来管理。
 
-支持两种创作模式：**AI 流水线写作**（规划→起草→润色→审阅→修复）和**共创模式**（作者手写 + AI 审查 + AI 按需介入润色）。19 个确定性 Python 脚本负责检查、索引和门禁，AI 负责创作判断。
+支持两种创作模式：**AI 流水线写作**（规划→起草→润色→审阅→修复）和**共创模式**（作者手写 + AI 审查 + AI 按需介入润色）。25 个确定性 Python 脚本负责检查、索引和门禁，AI 负责创作判断。
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Claude%20Code%20%7C%20Codex%20CLI-green)
@@ -34,7 +34,7 @@
 - **完整状态机：** 10 状态章节生命周期，含 `needs-rewrite` 和 `needs-repair` 显式失败回路。
 - **Hook 伏笔系统：** open / advance / escalate / resolve / defer 全生命周期 + 半衰期防遗忘 + 活跃预算控制。
 - **去 AI 味管线：** style_blacklist 负面清单 + scene-beat 场景拆解 + Polish 润色层。
-- **Skill 可插拔扩展 + Python 辅助体检：** 注册制 skill 系统 + 19 个确定性检查脚本（上下文工程、流程门禁、知识索引、文风分析、漂移检测、文风拆解、项目迁移）。
+- **Skill 可插拔扩展 + Python 辅助体检：** 注册制 skill 系统 + 25 个确定性检查脚本（上下文工程、流程门禁、知识索引、文风分析、漂移检测、文风拆解、项目迁移）。
 
 ## 快速开始
 
@@ -168,18 +168,21 @@ skill 输出进入 story/runtime/chapter-000N.skill-SKILLNAME.md
 
 | 模式 | 说明 |
 |---|---|
-| **有 Python 3 环境** | 19 个脚本负责文件完整性、JSON 合法性、hook 半衰期、文本审计等确定性检查，AI 负责创作判断 |
+| **有 Python 3 环境** | 25 个脚本负责文件完整性、JSON 合法性、hook 半衰期、文本审计等确定性检查，AI 负责创作判断 |
 | **无 Python 或不使用** | AI 手动执行等效检查（逐项验证文件、计算半衰期、扫描禁止模式等），产物标注 `(manual)`，功能完整但可靠性略低于脚本 |
 
 ### 脚本分类
 
-19 个 Python 脚本按功能分为五组：
+25 个 Python 脚本按功能分为六组：
 
 | 类别 | 脚本 | 说明 |
 |---|---|---|
 | **体检与索引** | `doctor.py` / `chapter_index.py` / `status.py` | 项目健康检查、章节索引生成、项目状态概览 |
 | **Hook 审计** | `hook_report.py` / `hook_matrix.py` | 活跃 hook 预算、半衰期到期、依赖环检测 |
-| **上下文与门禁** | `context_builder.py` / `prompt_compiler.py` / `gatekeeper.py` | 按 Agent 构建上下文包、三层 prompt 编译、确定性门禁检查 |
+| **上下文引擎** | `relevance_resolver.py` / `context_builder.py` / `prompt_compiler.py` / `gatekeeper.py` | 精确上下文注入、按 Agent 构建上下文包、三层 prompt 编译、确定性门禁 |
+| **账本与视图** | `ledger_manager.py` / `render_views.py` | 结构化小说账本 CRUD、Markdown 视图渲染 |
+| **章节统筹** | `director_sheet.py` | 章节导演表生成与验证 |
+| **平台适配** | `sync_skills.py` | Skills 同步到 .claude/skills/ 和 .agents/skills/ |
 | **文风与角色** | `style_report.py` / `character_drift_report.py` / `decompose_style.py` / `text_audit.py` | 句长/对白密度分析、角色漂移预警、文风拆解、文本审计 |
 | **知识与迁移** | `knowledge_index.py` / `import_inkos_project.py` / `structure_report.py` / `skill_check.py` | 项目知识索引、InkOS 项目迁移、结构覆盖检查、Skill 注册校验 |
 | **共创辅助** | `review_author_chapter.py` / `polish_author_chapter.py` / `create_project.py` | 手写稿审查简报、手写稿润色简报、新项目创建 |
@@ -221,21 +224,28 @@ python3 scripts/knowledge_index.py query --domain 中医方剂 --keyword 金疮�
 ## 目录结构
 
 ```text
-CLAUDE.md / START_HERE.md / RUN_RULES.md    启动协议、启动指令、脚本门禁
-PROJECT_INTRO.md / ORIGIN.md / LICENSE       项目介绍、起源致谢、AGPL-3.0
+CLAUDE.md / AGENTS.md / START_HERE.md / RUN_RULES.md    启动协议、脚本门禁
+PROJECT_INTRO.md / ORIGIN.md / LICENSE                   项目介绍、起源、AGPL-3.0
 
+workflow/          系统原则与章节生命周期
 .claude/agents/    Claude Code subagent 注册（薄路由层）
+.claude/skills/    Claude Code 原生 Skills 入口
+.agents/skills/    Codex 原生 Skills 入口（同步脚本生成）
+.codex/            Codex Agent 注册 + hooks.json
 agents/            各 Agent 详细职责 prompt
 story/
   outline/         故事框架、分卷地图、扩写蓝图
-  runtime/         每章 intent/plan + Agent 产出 + 批量 audit
-  roles/           角色卡（含 Personality Lock、压力测试）
+  runtime/         每章 intent/plan + Agent 产出 + 模板
+  ledger/          结构化事实账本（JSONL，7 类）
+  views/           作者可读 Markdown 视图（脚本生成）
+  plans/           章节导演表（YAML）
+  roles/           角色卡（含 Personality Lock）
   state/           JSON 状态镜像
   style_samples/   用户风格样本
-  *.md             状态账本与风格规则（19 个文件）
-skills/            可插拔 skill 接口与注册表
-scripts/           19 个 Python 确定性辅助脚本
+skills/            可插拔 skill 接口与注册表（正式来源）
+scripts/           25 个 Python 确定性辅助脚本
 chapters/          正文章节（000N_标题.md）
+tests/             回归测试
 ```
 
 ## 使用示例
@@ -356,7 +366,7 @@ AI:   [decompose_style.py --input chapters/drafts/chapter-0001.author.md] →
 
 ## 更新计划
 
-当前版本：**v0.2.1**。v0.2.0 为全面运行时升级。下一个大版本 **v0.3.0** 将聚焦 Context Engine 重构与平台原生化，后续 **v0.4.0** 将交付 Markdown-native 作者工作台体验。
+当前版本：**v0.3.0**。v0.2.0 为全面运行时升级。v0.3.0 已完成 Context Engine 重构与平台原生化，后续 **v0.4.0** 将交付 Markdown-native 作者工作台体验。
 
 详细路线图见 **[ROADMAP.md](ROADMAP.md)**（约 600 行，涵盖核心诊断、版本路线、难度评估、产品定位与实现方案）。
 
@@ -364,8 +374,8 @@ AI:   [decompose_style.py --input chapters/drafts/chapter-0001.author.md] →
 
 | 版本 | 主题 | 核心交付 |
 |---|---|---|
-| **v0.2.2** | 正确性修复 | prompt_compiler bug 修复、Context Builder 精准筛选、5000 字符截断修复、DASHBOARD.md 自动生成 |
-| **v0.3** | 平台原生化 + Context Engine | CLAUDE.md 精简/AGENTS.md 新增、结构化账本（JSONL+Views）、Relevance Resolver、Skills 同步、章节导演表+接力卡 |
+| **v0.2.2** | ✅ 正确性修复 | prompt_compiler bug 修复、Context Builder 精准筛选、5000 字符截断修复（已在 v0.3.0 中完成） |
+| **v0.3** | ✅ 平台原生化 + Context Engine | CLAUDE.md 精简/AGENTS.md 新增、结构化账本（JSONL+Views）、Relevance Resolver、Skills 同步、章节导演表+接力卡 |
 | **v0.4** | 作者体验增强 | 伏笔看板、段落级 diff、章节双循环工作流、角色声音实验室、版本管理、文笔拆解 |
 
 ### 产品定位

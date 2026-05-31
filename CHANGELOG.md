@@ -1,5 +1,41 @@
 # Changelog
 
+## v0.3.0 — 平台原生化 + 上下文引擎重构
+
+### 平台原生化
+
+- **CLAUDE.md 精简** — 从 513 行压缩到 103 行核心路由。流程细节移至 `workflow/` 目录
+- **AGENTS.md 新增** — Codex CLI/IDE Extension 原生入口，与 CLAUDE.md 同源
+- **Skills 同步系统** — `skills/sync_skills.py` 将 `skills/`（唯一正式来源）同步到 `.claude/skills/` + `.agents/skills/` 轻量入口包装
+- **Codex 适配** — 新增 `.codex/agents/` + `.codex/hooks.json`（生命周期脚本绑定）
+- **6 个 Skill 入口创建** — plan_chapter, write_chapter, review_chapter, polish_author_draft, import_outline, deepen_character
+
+### 上下文引擎重构
+
+- **结构化小说账本** — `story/ledger/` 中 7 个 JSONL 文件（facts, hooks, timeline, characters, relationships, secrets, locations）+ `scripts/ledger_manager.py` 管理脚本
+- **Markdown Views 双轨** — `story/views/` + `scripts/render_views.py` 将 JSONL 渲染为作者可读 Markdown（hook_dashboard, knowledge_matrix, timeline, relationships）
+- **Relevance Resolver** — `scripts/relevance_resolver.py` 替代 context_builder 的核心逻辑：根据章节 plan 的 cast_ids/hook_ids/secret_ids 精确检索，为不同 Agent 构建差异化任务包
+- **Prompt Compiler 去重** — 修复 `find_runtime_file` glob 过于宽泛的问题，增加排除过滤器
+
+### 全章统筹基础设施
+
+- **章节导演表** — `story/plans/_template.director_sheet.yaml` + `scripts/director_sheet.py` 生成脚本
+- **场景接力卡** — `story/runtime/_template.scene_handoffs.yaml` 防止前后场景断裂
+- **全章连续性审查** — `story/runtime/_template.coherence_review.md` 五链检查（因果/情绪/信息/物理/节奏）
+
+### v0.2.2 前置修复（已包含）
+
+- **ROOT 路径统一修复** — 全部 18 个脚本支持 `--project-root`，默认使用当前工作目录
+- **context_builder 精准筛选** — 角色按 cast_ids 过滤、摘要精确提取前一章、伏笔按章节相关性筛选
+- **共创脚本全文截断修复** — review_author_chapter.py 和 polish_author_chapter.py 取消 5000 字符硬截断，改为全文分块输出
+- **Context Packet 输出增强** — 注入条目标注原因、省略条目标注省略原因
+
+### 质量保障
+
+- **回归测试** — `tests/` 目录，含 test_ledger.py（账本 CRUD）、test_context_budget.py（预算验证）、conftest.py（fixtures）
+
+---
+
 ## v0.2.0 — 全面运行时升级
 
 ### 新增脚本（共 11 个，v0.1.0 原有 8 个 → 现共 19 个）

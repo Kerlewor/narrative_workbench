@@ -9,12 +9,13 @@ Usage:
 """
 
 from __future__ import annotations
+from _project import add_root_argument, get_root
 
 import json
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT: Path = Path.cwd()  # Set in main() via --project-root or CWD
 
 
 def count_chapters() -> tuple[int, int, int]:
@@ -97,7 +98,14 @@ def check_role_drift_risks() -> list[str]:
 
 
 def main() -> int:
-    verbose = "--verbose" in sys.argv or "-v" in sys.argv
+    global ROOT
+    import argparse
+    parser = argparse.ArgumentParser(description="Project Status")
+    add_root_argument(parser)
+    parser.add_argument("--verbose", "-v", action="store_true", help="详细输出")
+    args = parser.parse_args()
+    ROOT = get_root(args)
+    verbose = args.verbose
 
     total_ch, final_ch, draft_ch = count_chapters()
     active_hooks, resolved_hooks, expired_hooks = count_hooks()

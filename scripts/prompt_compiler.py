@@ -22,13 +22,16 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-ROOT = Path(__file__).resolve().parents[1]
+from _project import add_root_argument, get_root
+
+ROOT: Path = Path.cwd()
 
 AGENT_BASE_FILES = {
     "writer": "agents/writer.md",
     "polish": "agents/polish.md",
     "review": "agents/review.md",
     "fixer": "agents/fixer.md",
+    "librarian": "agents/project-librarian.md",
 }
 
 PROJECT_RULE_FILES: list[tuple[str, str]] = [
@@ -64,7 +67,10 @@ def find_runtime_file(pattern: str, chapter: int) -> Optional[Path]:
     if candidate.is_file():
         return candidate
     glob_pattern = f"{prefix}.*{pattern}*.md"
-    matches = sorted((ROOT / "story/runtime").glob(glob_pattern))
+    matches = sorted(
+        p for p in (ROOT / "story/runtime").glob(glob_pattern)
+        if not p.name.endswith((".context.md", ".prompt.md", ".gatekeeper.md"))
+    )
     return matches[0] if matches else None
 
 
@@ -115,7 +121,7 @@ def build_layer_project_rules() -> str:
     return "\n".join(parts)
 
 
-def build_layer_task(chapter: int, context_path: Optional[str] = None) -> str:
+def build_layer_task(chapter: int, agent: str, context_path: Optional[str] = None) -> str:
     """Layer 3: Chapter-specific task injection."""
     parts: list[str] = []
     parts.append("## 3. 本章任务\n")
@@ -198,6 +204,7 @@ def build_output_contract(agent: str, chapter: int) -> str:
         "polish": f"story/runtime/{prefix}.polish.md",
         "review": f"story/runtime/{prefix}.review.md",
         "fixer": f"story/runtime/{prefix}.fixer.md",
+        "librarian": f"story/runtime/session-YYYYMMDD-context.md",
     }
 
     lines: list[str] = []
@@ -220,6 +227,7 @@ def compile_prompt(agent: str, chapter: int, context_path: Optional[str] = None)
         "polish": "Polish Agent - Chapter Task",
         "review": "Review Agent - Chapter Task",
         "fixer": "Fixer Agent - Chapter Task",
+        "librarian": "Project Librarian - Context Packet",
     }
 
     parts.append(f"# {name_map.get(agent, f'{agent.upper()} Agent')} {chapter}\n")
@@ -235,7 +243,7 @@ def compile_prompt(agent: str, chapter: int, context_path: Optional[str] = None)
     parts.append(build_layer_project_rules())
     parts.append("")
 
-    parts.append(build_layer_task(chapter, context_path))
+    parts.append(build_layer_task(chapter, agent, context_path))
     parts.append("")
 
     parts.append(build_output_contract(agent, chapter))
@@ -244,16 +252,19 @@ def compile_prompt(agent: str, chapter: int, context_path: Optional[str] = None)
 
 
 def main() -> int:
+    global ROOT
     parser = argparse.ArgumentParser(description="Prompt Compiler for Narrative Workbench")
+    add_root_argument(parser)
     parser.add_argument("--chapter", type=int, required=True, help="章节编号")
     parser.add_argument("--agent", type=str, required=True,
-                        choices=["writer", "polish", "review", "fixer"],
+                        choices=["writer", "polish", "review", "fixer", "librarian"],
                         help="目标 Agent")
     parser.add_argument("--context", type=str, default=None,
                         help="预构建的上下文包路径（可选，默认自动查找）")
     parser.add_argument("--output", type=str, default=None,
                         help="输出路径（默认 story/runtime/chapter-XXXX.<agent>.prompt.md）")
     args = parser.parse_args()
+    ROOT = get_root(args)
 
     prompt = compile_prompt(args.agent, args.chapter, args.context)
 

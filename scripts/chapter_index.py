@@ -7,6 +7,7 @@ Usage:
 """
 
 from __future__ import annotations
+from _project import add_root_argument, get_root
 
 import argparse
 import json
@@ -15,7 +16,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT: Path = Path.cwd()  # Set in main() via --project-root or CWD
 CHAPTERS_DIR = ROOT / "chapters"
 INDEX_PATH = CHAPTERS_DIR / "index.json"
 CHAPTER_RE = re.compile(r"^(?P<num>\d{4})_(?P<title>.+)\.md$")
@@ -40,7 +41,7 @@ def scan_chapters() -> list[dict[str, object]]:
                 "chapter": int(match.group("num")),
                 "title": match.group("title"),
                 "file": str(path.relative_to(ROOT)),
-                "status": "final",
+                "status": "string",
                 "wordCount": count_cjk_words(text),
                 "updatedAt": datetime.fromtimestamp(stat.st_mtime, timezone.utc).isoformat(),
             }
@@ -61,7 +62,7 @@ def build_index() -> dict[str, object]:
             "chapter": "number",
             "title": "string",
             "file": "string",
-            "status": "final",
+            "status": "string",
             "wordCount": "number",
             "updatedAt": "string",
         },
@@ -69,11 +70,14 @@ def build_index() -> dict[str, object]:
 
 
 def main() -> int:
+    global ROOT
     parser = argparse.ArgumentParser()
+    add_root_argument(parser)
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--check", action="store_true", help="check chapters/index.json without writing")
     mode.add_argument("--write", action="store_true", help="rewrite chapters/index.json from chapter files")
     args = parser.parse_args()
+    ROOT = get_root(args)
 
     generated = build_index()
 

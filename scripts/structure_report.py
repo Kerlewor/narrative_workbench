@@ -10,13 +10,14 @@ Usage:
 """
 
 from __future__ import annotations
+from _project import add_root_argument, get_root
 
 import json
 import re
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT: Path = Path.cwd()  # Set in main() via --project-root or CWD
 
 REQUIRED_OUTLINE_FILES = [
     "story/brief.md",
@@ -93,6 +94,7 @@ def non_placeholder(text: str) -> bool:
 
 
 def main() -> int:
+    global ROOT
     warnings: list[str] = []
     errors: list[str] = []
 
@@ -110,6 +112,11 @@ def main() -> int:
         text = path.read_text(encoding="utf-8")
         if initialized and not non_placeholder(text):
             warnings.append(f"structure file appears unfilled: {rel}")
+
+    # Check v0.3+ structural directories
+    for d in ["story/ledger", "story/views", "story/plans", "workflow"]:
+        if not (ROOT / d).is_dir():
+            errors.append(f"missing structural directory: {d}")
 
     print(f"chapterFiles: {len(chapters)}")
     if chapters:
@@ -208,4 +215,9 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Structure Report")
+    add_root_argument(parser)
+    args = parser.parse_args()
+    ROOT = get_root(args)
     raise SystemExit(main())

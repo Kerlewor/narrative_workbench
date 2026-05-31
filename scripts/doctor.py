@@ -6,6 +6,7 @@ Run from the project root:
 """
 
 from __future__ import annotations
+from _project import add_root_argument, get_root
 
 import json
 import re
@@ -13,25 +14,39 @@ import sys
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT: Path = Path.cwd()  # Set in main() via --project-root or CWD
 
 REQUIRED_FILES = [
     "CLAUDE.md",
+    "AGENTS.md",
     "START_HERE.md",
     "RUN_RULES.md",
     "PROJECT_INTRO.md",
-    "scripts/create_project.py",
+    "workflow/constitution.md",
+    "workflow/lifecycle.md",
+    "scripts/chapter_index.py",
     "scripts/context_builder.py",
+    "scripts/create_project.py",
     "scripts/prompt_compiler.py",
     "scripts/gatekeeper.py",
+    "scripts/hook_report.py",
+    "scripts/hook_matrix.py",
+    "scripts/structure_report.py",
+    "scripts/text_audit.py",
     "scripts/knowledge_index.py",
     "scripts/status.py",
+    "scripts/skill_check.py",
     "scripts/style_report.py",
     "scripts/character_drift_report.py",
     "scripts/decompose_style.py",
     "scripts/import_inkos_project.py",
     "scripts/review_author_chapter.py",
     "scripts/polish_author_chapter.py",
+    "scripts/relevance_resolver.py",
+    "scripts/ledger_manager.py",
+    "scripts/render_views.py",
+    "scripts/director_sheet.py",
+    "scripts/sync_skills.py",
     "skills/skill_protocol.md",
     "skills/skill_registry.md",
     "skills/_template.skill-entry.md",
@@ -47,6 +62,7 @@ REQUIRED_FILES = [
     "story/emotional_arcs.md",
     "story/outline/story_frame.md",
     "story/outline/volume_map.md",
+    "story/outline/_template.discovery.md",
     "story/outline/_template.import-outline.md",
     "story/runtime/_template.intent.md",
     "story/runtime/_template.plan.md",
@@ -54,6 +70,11 @@ REQUIRED_FILES = [
     "story/runtime/_template.agent-handoff.md",
     "story/runtime/_template.scene-beat.md",
     "story/runtime/_template.context-packet.md",
+    "story/runtime/_template.batch-audit.md",
+    "story/runtime/_template.batch-plan.md",
+    "story/runtime/_template.coherence_review.md",
+    "story/runtime/_template.session-close.md",
+    "story/runtime/_template.scene_handoffs.yaml",
     "agents/project-librarian.md",
     "agents/writer.md",
     "agents/polish.md",
@@ -254,8 +275,9 @@ class Doctor:
             rel = path.relative_to(ROOT)
             match = re.search(r"^status:\s*([A-Za-z0-9_-]+)\s*$", text, re.MULTILINE)
             if not match:
-                skip_patterns = ("_template.", ".context.md", ".gatekeeper.md", ".prompt.md", ".knowledge_packet.md", ".style_report.md", ".character_drift.md", ".author_review_brief.md", ".author_polish_")
-                if not any(path.name.endswith(p) or path.name.startswith(p.lstrip(".")) for p in skip_patterns):
+                skip_prefixes = ("_template.",)
+                skip_suffixes = (".context.md", ".gatekeeper.md", ".prompt.md", ".knowledge_packet.md", ".style_report.md", ".character_drift.md", ".author_review_brief.md", ".author_polish_", ".resolved.md")
+                if not (path.name.startswith(skip_prefixes) or path.name.endswith(skip_suffixes)):
                     self.warn(f"runtime file has no status: {rel}")
                 continue
             status = match.group(1)
@@ -329,4 +351,9 @@ class Doctor:
 
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Narrative Workbench doctor")
+    add_root_argument(parser)
+    args = parser.parse_args()
+    ROOT = get_root(args)
     sys.exit(Doctor().run())

@@ -1,0 +1,83 @@
+# Chapter Director Sheet — 章节导演表
+# 比场景卡更高层的全章蓝图，定义章节整体推进图与节奏曲线。
+#
+# 使用方式:
+#   1. 复制本文件为 story/plans/chapter_NNNN_director_sheet.yaml
+#   2. 填入本章规划
+#   3. Writer 每次写场景时读取: 导演表 + 当前场景卡 + 上一场景接力状态 + 相关角色与伏笔事实
+#
+# 注意: 导演表不替代 intent/plan，而是补充全章统筹信息。
+#       intent = 本章在整卷中的位置和功能
+#       plan = 本章的场景级施工计划
+#       director_sheet = 本章的情绪曲线、信息释放计划和场景接力图
+
+chapter: 0
+title: "章节标题"
+pov: "主要视点角色 ID"
+
+# === 本章目的 ===
+chapter_purpose:
+  plot: "情节推进目标"
+  relationship: "关系线推进目标"
+  mystery: "悬念推进目标"
+
+# === 开篇状态 ===
+opening_state:
+  location: "开篇地点"
+  # 主要角色开篇情绪
+  # character_id: 情绪描述
+
+# === 结尾状态 ===
+closing_state:
+  location: "结尾地点"
+  # 主要角色结尾情绪
+  relationship_change: "关系变化"
+  hook_change: "伏笔变化"
+
+# === 全章情绪曲线 ===
+emotional_arc:
+  start: "情绪起点描述"
+  middle: "情绪中点描述"
+  end: "情绪终点描述"
+
+# === 信息释放计划 ===
+# 每个场景应该释放和保留什么信息
+information_release:
+  scene_01: "暗示什么 / 确认什么"
+  scene_02: "证明什么 / 保留什么"
+  scene_03: ""
+  scene_04: ""
+
+# === 禁止揭示 ===
+forbidden_reveals:
+  - "绝对不能在这一章揭示的秘密或事实"
+
+# === 全章语言节奏曲线 ===
+# 约束每个场景的语言风格，防止 Polish 抹平全章节奏
+style_arc:
+  scene_01: "冷静、迟疑、留白较多"
+  scene_02: "对话压迫感增强"
+  scene_03: "信息确认后句式变短"
+  scene_04: "安静和疏离收尾"
+
+# === 场景接力链 ===
+scene_chain:
+  - id: scene_01
+    role: "引发"     # 引发 / 对抗 / 证实 / 转折 / 留钩
+    input_state: "场景开始时角色的状态"
+    output_state: "场景结束时角色的状态，下一场景 must-use"
+
+  - id: scene_02
+    role: "对抗"
+    input_state: ""
+    output_state: ""
+
+  - id: scene_03
+    role: "证实"
+    input_state: ""
+    output_state: ""
+
+  - id: scene_04
+    role: "留钩"
+    input_state: ""
+    output_state: ""

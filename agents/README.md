@@ -8,7 +8,7 @@ Writer、Polish、Review、Fixer 在同一主会话内持续存活，首次创�
 
 Project Librarian 每次调用独立执行，不保留跨次记忆。
 
-详见 `CLAUDE.md` 的"Agent 职责"章节。
+详见 `CLAUDE.md` 的"Agent 调度"章节。
 
 ## 上下文入口
 

@@ -2,6 +2,8 @@
 
 > Agent 会话终止时由主会话填写。仅用于记录，不做跨会话知识迁移——新 Agent 从项目文件重建基线。
 
+status: planned
+
 ---
 agent: writer|polish|review|fixer
 chaptersProcessed:

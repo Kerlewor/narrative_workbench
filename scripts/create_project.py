@@ -7,6 +7,7 @@ Usage:
 """
 
 from __future__ import annotations
+from _project import add_root_argument, get_root
 
 import argparse
 import json
@@ -16,7 +17,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
-TEMPLATE_ROOT = Path(__file__).resolve().parents[1]
+TEMPLATE_ROOT: Path = Path(__file__).resolve().parents[1]
 DEFAULT_TARGET_ROOT = TEMPLATE_ROOT.parents[1]  # .../books
 
 
@@ -84,10 +85,13 @@ def reset_runtime_outputs(project_root: Path) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
+    add_root_argument(parser)
     parser.add_argument("project_name", help="new project display name")
     parser.add_argument("--target", default=str(DEFAULT_TARGET_ROOT), help="target parent directory")
     parser.add_argument("--force", action="store_true", help="overwrite target project directory")
     args = parser.parse_args()
+    # --project-root is accepted but has no effect: TEMPLATE_ROOT is always
+    # the directory containing this script's parent (the template root).
 
     target_root = Path(args.target).expanduser()
     if not target_root.is_absolute():
@@ -102,7 +106,7 @@ def main() -> int:
             return 1
         shutil.rmtree(project_root)
 
-    ignore = shutil.ignore_patterns("__pycache__", ".DS_Store")
+    ignore = shutil.ignore_patterns("__pycache__", ".DS_Store", ".git", ".github", ".gitattributes")
     shutil.copytree(TEMPLATE_ROOT, project_root, ignore=ignore)
     reset_runtime_outputs(project_root)
     update_manifest(project_root, args.project_name)

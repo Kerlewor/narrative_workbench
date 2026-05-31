@@ -49,6 +49,14 @@
 - `story/runtime/chapter-*.context.md`
 - `story/runtime/chapter-*.prompt.md`
 - `story/runtime/chapter-*.gatekeeper.md`
+- `story/runtime/chapter-*.final-check.md`
+- `story/runtime/chapter-*.resolved.md`
+- `story/runtime/chapter-*.style_report.md`
+- `story/runtime/chapter-*.character_drift.md`
+- `story/runtime/chapter-*.knowledge_packet.md`
+- `story/runtime/chapter-*.session-close.md`
+- `story/runtime/chapter-*_scene_handoffs.yaml`
+- `story/runtime/chapter-*_coherence_review.md`
 - `story/runtime/*.skill-*.md`
 
 Agent 只能输出到 working 区。canonical 区由主会话统一提交。

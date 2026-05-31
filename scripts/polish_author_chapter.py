@@ -19,7 +19,9 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-ROOT = Path(__file__).resolve().parents[1]
+from _project import add_root_argument, get_root
+
+ROOT: Path = Path.cwd()
 
 POLISH_MODES = {
     "preserve-author-style": {
@@ -77,6 +79,63 @@ def chapter_prefix(chapter: int) -> str:
     return f"chapter-{chapter:04d}"
 
 
+def _chunk_text(text: str, max_chunk_chars: int = 8000) -> list[str]:
+    """Split text into paragraph-preserving chunks with IDs."""
+    paragraphs = text.split("\n\n")
+    chunks: list[str] = []
+    current_chunk: list[str] = []
+    current_len = 0
+    para_idx = 0
+
+    for para in paragraphs:
+        para_len = len(para)
+        if current_len + para_len > max_chunk_chars and current_chunk:
+            para_range = f"[段落 {para_idx - len(current_chunk) + 1}–{para_idx}]"
+            chunks.append(f"## {para_range}\n\n" + "\n\n".join(current_chunk))
+            current_chunk = [para]
+            current_len = para_len
+        else:
+            current_chunk.append(para)
+            current_len += para_len
+        para_idx += 1
+
+    if current_chunk:
+        para_range = f"[段落 {para_idx - len(current_chunk) + 1}–{para_idx}]"
+        chunks.append(f"## {para_range}\n\n" + "\n\n".join(current_chunk))
+
+    return chunks
+
+
+def _build_fulltext_section(text: str, max_total_chars: int = 50000) -> str:
+    """Build the full-text section with chunking and warnings."""
+    if len(text) <= 8000:
+        return text
+
+    chunks = _chunk_text(text)
+    total_chars = len(text)
+
+    if total_chars > max_total_chars:
+        truncated = text[:max_total_chars]
+        last_break = truncated.rfind("\n\n")
+        if last_break > 0:
+            truncated = truncated[:last_break]
+        included_chunks = _chunk_text(truncated)
+        warning = (
+            f"⚠ **正文过长警告**: 全文共 {total_chars} 字符，已截取前 {max_total_chars} 字符 "
+            f"（{len(included_chunks)} 个分块）。剩余约 {total_chars - max_total_chars} 字符未包含。\n"
+            f"建议对超长章节分批次润色。\n\n"
+            f"---\n\n"
+        )
+        return warning + "\n\n".join(included_chunks)
+
+    header = (
+        f"全文共 {total_chars} 字符，{len(chunks)} 个分块。"
+        f"每块保留段落 ID 范围以供定位。\n\n"
+        f"---\n\n"
+    )
+    return header + "\n\n".join(chunks)
+
+
 def find_author_draft(chapter: int) -> Optional[Path]:
     drafts_dir = ROOT / "chapters/drafts"
     drafts_dir.mkdir(parents=True, exist_ok=True)
@@ -89,7 +148,9 @@ def find_author_draft(chapter: int) -> Optional[Path]:
 
 
 def main() -> int:
+    global ROOT
     parser = argparse.ArgumentParser(description="Polish Author Chapter")
+    add_root_argument(parser)
     parser.add_argument("--chapter", type=int, default=0)
     parser.add_argument("--input", type=str, default=None)
     parser.add_argument("--mode", type=str, default="preserve-author-style",
@@ -97,6 +158,7 @@ def main() -> int:
                         help="润色模式")
     parser.add_argument("--output", type=str, default=None)
     args = parser.parse_args()
+    ROOT = get_root(args)
 
     if args.input:
         source_path = Path(args.input)
@@ -140,8 +202,9 @@ def main() -> int:
         output_path = ROOT / "story/runtime" / f"{prefix}.author_polish_{mode_alias}.md"
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
+    fulltext_section = _build_fulltext_section(text)
     output_path.write_text(
-        lines[0] + "\n" + "\n".join(lines[1:]) + "\n\n## 手写稿正文\n\n" + text[:5000],
+        lines[0] + "\n" + "\n".join(lines[1:]) + "\n\n## 手写稿正文\n\n" + fulltext_section,
         encoding="utf-8"
     )
 

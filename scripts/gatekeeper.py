@@ -14,6 +14,7 @@ Output:
 """
 
 from __future__ import annotations
+from _project import add_root_argument, get_root
 
 import argparse
 import re
@@ -21,7 +22,7 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT: Path = Path.cwd()  # Set in main() via --project-root or CWD
 
 PIPELINE_STAGES = ["intent", "plan", "writer", "polish", "review", "fixer"]
 
@@ -94,15 +95,15 @@ def check_review_items_addressed(chapter: int) -> tuple[bool, list[str]]:
         r"\| (严重|高|中|低)\s*\|.*?\|.*?\|",
         review_text, re.MULTILINE
     )
+    # Exclude header rows like "| 严重度 | 位置 | ..."
+    review_sections = [s for s in review_sections if s not in ("严重",)]
     mandatory_count = len(review_sections)
 
     if mandatory_count == 0:
         return True, []
 
     issues: list[str] = []
-    if "必修问题" in review_text and len(review_sections) == 0:
-        passed = True
-    elif len(review_sections) > 0:
+    if len(review_sections) > 0:
         fixer_mentions = len(re.findall(r"(修复|修正|已处理|applied|fixed)", fixer_text, re.IGNORECASE))
         if fixer_mentions == 0:
             issues.append(
@@ -328,7 +329,9 @@ def build_report(chapter: int, stage: str) -> str:
 
 
 def main() -> int:
+    global ROOT
     parser = argparse.ArgumentParser(description="Gatekeeper for Narrative Workbench")
+    add_root_argument(parser)
     parser.add_argument("--chapter", type=int, required=True, help="章节编号")
     parser.add_argument("--stage", type=str, default="final",
                         choices=["intent", "writer", "polish", "review", "fixer", "final"],
@@ -336,6 +339,7 @@ def main() -> int:
     parser.add_argument("--output", type=str, default=None,
                         help="输出路径（默认 story/runtime/chapter-XXXX.gatekeeper.md）")
     args = parser.parse_args()
+    ROOT = get_root(args)
 
     report = build_report(args.chapter, args.stage)
 

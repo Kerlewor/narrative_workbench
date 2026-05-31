@@ -1,5 +1,5 @@
 {
-  "version": "1.0",
+  "version": "0.3.0",
   "project": "NARRATIVE_WORKBENCH_TEMPLATE",
   "currentChapter": 0,
   "sourceOfTruth": "chapters/",
@@ -20,6 +20,8 @@
     "final-aligned",
     "superseded",
     "needs-repair",
-    "needs-rewrite"
+    "needs-rewrite",
+    "audited",
+    "context-packed"
   ]
 }

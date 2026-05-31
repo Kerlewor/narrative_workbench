@@ -11,6 +11,7 @@ Usage:
 """
 
 from __future__ import annotations
+from _project import add_root_argument, get_root
 
 import argparse
 import re
@@ -18,7 +19,7 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT: Path = Path.cwd()  # Set in main() via --project-root or CWD
 
 
 def chapter_prefix(chapter: int) -> str:
@@ -169,11 +170,14 @@ def build_report(chapter: int, character_name: Optional[str] = None) -> str:
 
 
 def main() -> int:
+    global ROOT
     parser = argparse.ArgumentParser(description="Character Drift Report")
+    add_root_argument(parser)
     parser.add_argument("--chapter", type=int, required=True)
     parser.add_argument("--character", type=str, default=None)
     parser.add_argument("--output", type=str, default=None)
     args = parser.parse_args()
+    ROOT = get_root(args)
 
     report = build_report(args.chapter, args.character)
 

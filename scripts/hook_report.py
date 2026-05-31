@@ -6,13 +6,14 @@ Usage:
 """
 
 from __future__ import annotations
+from _project import add_root_argument, get_root
 
 import argparse
 import re
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT: Path = Path.cwd()  # Set in main() via --project-root or CWD
 HOOKS_PATH = ROOT / "story/pending_hooks.md"
 ACTIVE_STATUSES = {"open", "progressing", "escalated", "dormant"}
 
@@ -39,9 +40,12 @@ def as_int(value: str) -> int | None:
 
 
 def main() -> int:
+    global ROOT
     parser = argparse.ArgumentParser()
+    add_root_argument(parser)
     parser.add_argument("--current", type=int, required=True, help="current chapter number")
     args = parser.parse_args()
+    ROOT = get_root(args)
 
     _, rows = parse_table()
     active = [row for row in rows if row.get("状态") in ACTIVE_STATUSES]
@@ -65,6 +69,9 @@ def main() -> int:
     missing_evidence: list[str] = []
     for row in active:
         hook_id = row.get("hook_id", "")
+        if not re.fullmatch(r"H\d{3,}", hook_id):
+            print(f"WARN: invalid hook_id format: {hook_id!r}")
+            warnings += 1
         last = as_int(row.get("最近推进", "")) or as_int(row.get("起始章节", ""))
         half_life = as_int(row.get("半衰期", ""))
         evidence = row.get("正文证据", "")
