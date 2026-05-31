@@ -372,11 +372,11 @@ AI:   [decompose_style.py --input chapters/drafts/chapter-0001.author.md] →
 
 ### 版本概览
 
-| 版本 | 主题 | 核心交付 |
-|---|---|---|
-| **v0.2.2** | 正确性修复 | prompt_compiler bug 修复、Context Builder 精准筛选、5000 字符截断修复（已在 v0.3.0 中完成） ✅ |
-| **v0.3** | 平台原生化 + Context Engine | CLAUDE.md 精简/AGENTS.md 新增、结构化账本（JSONL+Views）、Relevance Resolver、Skills 同步、章节导演表+接力卡 ✅ |
-| **v0.4** | 作者体验增强 | 伏笔看板、段落级 diff、章节双循环工作流、角色声音实验室、版本管理、文笔拆解 |
+| 版本 | 主题 | 核心交付 | 状态 |
+|---|---|---|---|
+| **v0.2.2** | 正确性修复 | prompt_compiler bug 修复、Context Builder 精准筛选、5000 字符截断修复（已在 v0.3.0 中完成） | ✅ 已完成 |
+| **v0.3** | 平台原生化 + Context Engine | CLAUDE.md 精简/AGENTS.md 新增、结构化账本（JSONL+Views）、Relevance Resolver、Skills 同步、章节导演表+接力卡 | ✅ 已完成 |
+| **v0.4** | 作者体验增强 | 伏笔看板、段落级 diff、章节双循环工作流、角色声音实验室、版本管理、文笔拆解 | 计划中 |
 
 ### 产品定位
 
