@@ -4,8 +4,8 @@ import json
 import sys
 from pathlib import Path
 
-# Ensure scripts/ is importable
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+# Ensure repository modules are importable
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import pytest
 

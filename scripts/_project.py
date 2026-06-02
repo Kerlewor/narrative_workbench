@@ -1,29 +1,10 @@
-"""Shared project root resolution for all Narrative Workbench scripts.
+"""Compatibility wrapper for project root resolution."""
 
-Supports explicit --project-root and falls back to current working directory.
-Replaces the former hardcoded `ROOT = Path(__file__).resolve().parents[1]` pattern.
-
-Usage:
-    from _project import add_root_argument, get_root
-
-    parser = argparse.ArgumentParser(...)
-    add_root_argument(parser)
-    args = parser.parse_args()
-    ROOT = get_root(args)
-"""
-
-import argparse
+import sys
 from pathlib import Path
 
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
-def add_root_argument(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument(
-        "--project-root", type=str, default=None,
-        help="Project root directory (default: current working directory)"
-    )
-
-
-def get_root(args: argparse.Namespace) -> Path:
-    if args.project_root:
-        return Path(args.project_root).resolve()
-    return Path.cwd()
+from core.project import add_root_argument, get_root  # noqa: E402,F401

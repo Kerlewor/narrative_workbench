@@ -355,7 +355,7 @@ chapter_019/
 
 ## 四、建议版本路线
 
-> **状态更新 (2026-05-31):** v0.2.2 和 v0.3.0 已全部完成交付。v0.4.0 为下一阶段。
+> **状态更新 (2026-06-02):** v0.2.2、v0.3.0 和 v0.4.0 已全部完成交付。v0.5.0 为下一阶段。
 
 ### v0.2.2：正确性修复（不增加功能）✅ 已完成
 
@@ -390,7 +390,7 @@ chapter_019/
 
 **此版完成后：项目从"提示词框架"升级为"小说上下文引擎"，具备分场景写作+全章统筹的完整能力，且在 Claude Code 和 Codex 上均为原生可调用。**
 
-### v0.4：内部架构优化与工作流增强
+### v0.4：内部架构优化与工作流增强 ✅ 已完成
 
 > **本版本仍面向 Claude Code / Codex 用户，提供优化后的脚本与 Agent 工作流，不提供独立 CLI 或普通作者安装版本。**
 
@@ -409,6 +409,8 @@ chapter_019/
 
 **向后兼容：** Claude Code / Codex Agent 用户的所有命令、路径和调用方式不变。
 
+**交付状态 (2026-06-02)：** 已新增 `core/` 模块体系，覆盖 project、ledger、context、chapter、gatekeeper、doctor、hooks、style、knowledge、prompt；主要脚本保留原入口并委托 core 模块。新增回归测试覆盖账本、上下文预算、导演表、场景接力卡、gatekeeper、doctor、hook 报告、文风审计、知识索引和 prompt 编译。Gatekeeper 已接入场景接力卡校验：缺失接力卡为兼容性警告，存在但结构不完整时为阻塞问题。
+
 ### v0.5：作者体验增强（全 Markdown-native）
 
 > 原 v0.4.0 计划中的作者功能顺延至 v0.5.0。v0.4.0 的 core/ 模块化为这些功能提供了更清晰的实现基础。
@@ -422,6 +424,36 @@ chapter_019/
 **全章统筹闭环：** 章节双循环工作流、不同长度章节差异化策略、自动同步结构化账本
 
 **扩展：** 版本管理与分支试写、文笔拆解训练、EPUB/DOCX 导出
+
+**附加计划：无 Python 感知的开源体验**
+
+> 目标不是立刻放弃 Python core，而是让普通作者不需要理解或安装 Python 环境。v0.5.0 在作者体验增强之外，同时验证"无依赖使用体验"和"跨语言实现协议"。
+
+**P0：打包式本地入口 `nw`**
+
+- 保留 Python `core/` 作为 reference implementation。
+- 提供单文件或目录式本地可执行入口（例如 `nw.exe`），让用户运行 `nw doctor`、`nw dashboard`、`nw gatekeeper --chapter N` 等命令时不需要手动安装 Python。
+- 打包候选：PyInstaller / Nuitka / zipapp。优先验证 Windows，因为当前用户群最容易遇到 Python 环境问题。
+- `scripts/` 继续保留给 Claude Code / Codex 用户，`nw` 作为普通作者和后续 UI 的统一本地入口。
+
+**P0：Core I/O 协议化**
+
+- 为主要 core 能力定义稳定 JSON 输入输出：project root、chapter、agent、mode、diagnostics、included_context、omitted_context、reports、patch_candidates。
+- Dashboard、diff、gatekeeper、context packet、knowledge packet 等产物都应能从结构化结果渲染成 Markdown，而不是只能从终端输出解析。
+- 目标是让 Python core、未来 TypeScript core、API 服务层和鸿蒙客户端都遵守同一协议。
+
+**P1：TypeScript core port 预备**
+
+- 暂不在 v0.5.0 直接重写全部 Python。
+- 先选择确定性、低语义风险模块作为 TypeScript port 候选：project、ledger、hooks、style、knowledge、doctor、chapter、gatekeeper。
+- Python core 保持 reference implementation；TypeScript port 只有在协议测试能证明行为一致后再纳入主线。
+- 不建议将开源 core 直接改写为 ArkTS。ArkTS 只作为鸿蒙客户端语言，核心逻辑优先在 Python/TypeScript/API 层演进。
+
+**P1：本地入口与未来界面的关系**
+
+- `nw` 负责本地项目文件读写、确定性检查、Markdown 产物生成。
+- VS Code 扩展、Web UI、TUI 或鸿蒙 API 服务都调用同一组 JSON 协议，不重复实现业务规则。
+- 这样 v0.5.0 的 Markdown Dashboard 既是作者体验功能，也是未来图形界面的交互原型。
 
 ---
 
@@ -959,7 +991,7 @@ v0.3.0 ✅ 已完成
   平台原生化 + 上下文引擎重构
   25 个脚本、JSONL 账本、Relevance Resolver
 
-v0.4.0 🚧 计划中 —— 架构优化与稳定性增强
+v0.4.0 ✅ 已完成 —— 架构优化与稳定性增强
   core/ 模块体系，抽取可复用逻辑
   scripts/ 委托 core/，调用方式不变
   扩展回归测试覆盖
@@ -967,7 +999,7 @@ v0.4.0 🚧 计划中 —— 架构优化与稳定性增强
   异常处理与降级说明增强
   面向 CC/Codex 用户，无独立 CLI
 
-v0.5.0 📋 规划中 —— App UI 的设计参考源
+v0.5.0 📋 规划中 —— App UI 的设计参考源 + 无依赖开源体验
   story/DASHBOARD.md 写作控制台
   结构化 diff 报告 + 按编号接受/拒绝
   伏笔看板 + 角色知识边界矩阵
@@ -976,6 +1008,9 @@ v0.5.0 📋 规划中 —— App UI 的设计参考源
   角色声音实验室
   版本管理与分支试写
   EPUB/DOCX 导出
+  nw.exe / 本地打包入口
+  core JSON I/O 协议
+  TypeScript core port 预备
   ════════════════════════════════
   v0.5.0 为双线分叉点，以下分两条线独立演进
 
@@ -1032,8 +1067,8 @@ v0.7.0 开源 📋                     章节版本云端存储
 ---
 
 > 创建日期：2026-05-29
-> 最后更新：2026-06-02（新增第十一节：鸿蒙 App 化路线图，v0.6.0 起双线并行）
+> 最后更新：2026-06-02（完成 v0.4.0 core/ 模块化与工作流稳定性增强）
 > 本文档整合了三份分析材料（核心诊断与提示词工程重构 / 平台定位与 TUI 判断 / 分段处理与全章统筹），覆盖 v0.2.2 → v0.3 → v0.4 → v0.5 四阶段版本路线。
-> v0.2.2 和 v0.3.0 已交付。下一阶段：v0.4.0 架构优化与工作流增强。
+> v0.2.2、v0.3.0 和 v0.4.0 已交付。下一阶段：v0.5.0 作者体验增强。
 > v0.6.0 起分为开源线（本仓库持续迭代）和闭源线（API 服务 + 鸿蒙 App，独立仓库）。
 > 旧版路线图已废弃。

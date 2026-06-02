@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.4.0 — 架构优化与工作流增强
+
+### Core 模块体系
+
+- **新增 `core/` 包** — 抽取 project、ledger、context、chapter、gatekeeper、doctor、hooks、style、knowledge、prompt 等可复用模块
+- **脚本薄包装化** — `ledger_manager.py`、`relevance_resolver.py`、`director_sheet.py`、`gatekeeper.py`、`doctor.py`、`hook_report.py`、`hook_matrix.py`、`style_report.py`、`text_audit.py`、`knowledge_index.py`、`prompt_compiler.py` 保留原命令入口，内部委托 core 模块
+- **项目根目录统一** — `scripts/_project.py` 改为 `core.project` 的兼容包装，继续支持 `--project-root`
+
+### 工作流稳定性
+
+- **场景接力卡校验** — 新增 `core.chapter.validate_scene_handoffs`，检查 handoffs、scene_id、handoff_to、physical_state、emotional_state、required_next_scene_input 等字段
+- **Gatekeeper 增强** — final gate 接入场景接力卡校验；缺失接力卡为非阻塞警告，已存在但结构不完整时为阻塞问题
+- **上下文核心复用** — `core.context` 承载 Relevance Resolver 的计划解析、角色/伏笔/秘密注入、预算估算和任务包生成
+- **Prompt 编译复用** — `core.prompt` 统一三层 prompt 编译、runtime 文件定位、硬约束与半衰期风险提示
+
+### 测试覆盖
+
+- **新增回归测试** — 覆盖 ledger、chapter、gatekeeper、doctor、hooks、style、knowledge、prompt 等 core 模块
+- **CLI smoke 验证** — 保留旧命令行为验证，确保 Claude Code / Codex 用户调用方式不变
+
+---
+
 ## v0.3.0 — 平台原生化 + 上下文引擎重构
 
 ### 平台原生化
