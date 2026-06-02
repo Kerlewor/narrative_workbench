@@ -368,7 +368,9 @@ AI:   [decompose_style.py --input chapters/drafts/chapter-0001.author.md] →
 
 ## 更新计划
 
-当前版本：**v0.3.0**。v0.2.0 为全面运行时升级。v0.3.0 已完成 Context Engine 重构与平台原生化，后续 **v0.4.0** 将聚焦核心引擎封装与统一 CLI 入口，为独立可执行程序和本地 Web 界面铺路。
+当前版本：**v0.3.0**。v0.2.0 为全面运行时升级。v0.3.0 已完成 Context Engine 重构与平台原生化，后续 **v0.4.0** 将聚焦核心引擎封装与统一 CLI 入口。
+
+**v0.6.0 起双线并行：** 开源线在本仓库持续迭代写作工作流、角色工具和社区生态；闭源线在独立仓库开发 API 服务层与鸿蒙 App，面向不想配置命令行的终端消费者。详见 ROADMAP.md 第十一节。
 
 详细路线图见 **[ROADMAP.md](ROADMAP.md)**（约 600 行，涵盖核心诊断、版本路线、难度评估、产品定位与实现方案）。
 
@@ -380,10 +382,11 @@ AI:   [decompose_style.py --input chapters/drafts/chapter-0001.author.md] →
 | **v0.3** | 平台原生化 + Context Engine | CLAUDE.md 精简/AGENTS.md 新增、结构化账本（JSONL+Views）、Relevance Resolver、Skills 同步、章节导演表+接力卡 | ✅ 已完成 |
 | **v0.4** | 核心引擎封装 + 统一入口 | core/ 模块体系、CLI 统一入口（nw 命令）、模型调用抽象层（Anthropic/OpenAI/DeepSeek）、PyInstaller 打包、PyPI 发布 | 计划中 |
 | **v0.5** | 作者体验增强 | 写作控制台（DASHBOARD）、结构化 diff 报告、章节双循环工作流、角色声音实验室、版本管理与分支试写、文笔拆解、EPUB/DOCX 导出 | 规划中 |
+| **v0.6+** | 双线并行 | 开源线：场景卡交互增强、社区 Skill 市场、多语言支持。闭源线：API 服务层 + 鸿蒙 App（独立仓库） | 规划中 |
 
 ### 产品定位
 
-v0.3.0 完成了平台原生化（Claude Code + Codex 双入口）。v0.4.0 将在保留 Agent 用户兼容入口的同时，通过 `core/` 模块封装和 CLI 统一入口，让项目可以脱离 Claude Code/Codex 独立运行——最终以 PyInstaller 打包的可执行文件和 PyPI 包两种形式分发。详见 [ROADMAP.md](ROADMAP.md)。
+v0.3.0 完成了平台原生化（Claude Code + Codex 双入口）。v0.4.0 将在保留 Agent 用户兼容入口的同时，通过 `core/` 模块封装和 CLI 统一入口，让项目可以脱离 Claude Code/Codex 独立运行。v0.5.0 完成作者体验增强后，自 v0.6.0 起项目分为双线发展——开源线持续迭代写作工作流与社区生态，闭源线开发 API 服务层与鸿蒙 App（独立仓库）。详见 [ROADMAP.md](ROADMAP.md)。
 
 ## 深入阅读
 

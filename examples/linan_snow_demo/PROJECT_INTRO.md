@@ -241,11 +241,11 @@ Claude Code 支持按 subagent 分配模型。例如在 `.claude/settings.json` 
 或在对话中直接指定：
 
 ```text
-你: 写第 3 章时，Writer 用 claude-sonnet-4-6，Review 用 claude-opus-4-7
+你: 写第 3 章时，Writer 用速度更快的模型节省成本，Review 用精度更高的模型保证审阅质量
 
-AI: 好的。已记录：Writer → sonnet，Review → opus。
-      Writer 草稿由 sonnet 生成，速度和成本更优；
-      Review 审阅由 opus 执行，审查更细致。
+AI: 好的。已记录：Writer → 快速模型，Review → 高精度模型。
+      Writer 草稿生成更经济高效；
+      Review 审阅检查更全面细致。
 ```
 
 这样可以为不同阶段选择不同性价比的模型——起草阶段用快速模型，审阅阶段用高精度模型。
