@@ -38,6 +38,12 @@ REQUIRED_FILES = [
     "scripts/render_views.py",
     "scripts/director_sheet.py",
     "scripts/sync_skills.py",
+    "scripts/dashboard.py",
+    "scripts/diff_workflow.py",
+    "scripts/nw",
+    "scripts/scene_card.py",
+    "scripts/voice_lab.py",
+    "scripts/export_book.py",
     "skills/skill_protocol.md",
     "skills/skill_registry.md",
     "skills/_template.skill-entry.md",
@@ -362,4 +368,3 @@ class Doctor:
     def run(self) -> int:
         self.check_all()
         return 1 if self.errors else 0
-

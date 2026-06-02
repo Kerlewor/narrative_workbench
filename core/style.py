@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from math import ceil
 from pathlib import Path
 from typing import Optional
 
@@ -50,7 +51,8 @@ AI_PATTERNS = [
 def count_cjk_words(text: str) -> int:
     cjk = re.findall(r"[\u4e00-\u9fff]", text)
     latin_words = re.findall(r"[A-Za-z0-9]+(?:[-_'][A-Za-z0-9]+)*", text)
-    return len(cjk) + len(latin_words)
+    latin_units = sum(max(1, ceil(len(word) / 3)) for word in latin_words)
+    return len(cjk) + latin_units
 
 
 def paragraph_blocks(text: str) -> list[str]:
@@ -232,4 +234,3 @@ def build_style_report(root: Path, chapter: int, input_path: Optional[str] = Non
     else:
         lines.append("- 各项指标在合理范围内，无需特别调整。")
     return "\n".join(lines)
-

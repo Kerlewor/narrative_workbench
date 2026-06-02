@@ -78,9 +78,18 @@ def write_project_intro(project_root: Path, project_name: str) -> None:
 
 def reset_runtime_outputs(project_root: Path) -> None:
     runtime_dir = project_root / "story/runtime"
-    for pattern in ("chapter-*.md", "batch-*.md", "*.skill-*.md"):
+    for pattern in ("chapter-*.md", "batch-*.md", "*.skill-*.md", "chapter-*.jsonl", "voice_lab.*.md"):
         for path in runtime_dir.glob(pattern):
             path.unlink()
+    diffs_dir = runtime_dir / "diffs"
+    if diffs_dir.is_dir():
+        shutil.rmtree(diffs_dir)
+    dashboard = project_root / "story/DASHBOARD.md"
+    if dashboard.is_file():
+        dashboard.unlink()
+    exports = project_root / "exports"
+    if exports.is_dir():
+        shutil.rmtree(exports)
 
 
 def main() -> int:
@@ -122,4 +131,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

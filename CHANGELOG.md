@@ -1,5 +1,30 @@
 # Changelog
 
+## v0.5.0 — 作者体验增强与分层 diff 工作流
+
+### Markdown-native 作者体验
+
+- **新增 `story/DASHBOARD.md` 生成器** — `core.dashboard` + `scripts/dashboard.py` + `nw dashboard`，输出当前章节、上一章、到期伏笔、未揭示秘密、时间线风险和下一步操作。
+- **新增分层共创 diff** — `core.diff_workflow` + `scripts/diff_workflow.py` + `nw diff`，对话只显示摘要，Markdown 承载阅读，JSONL 承载执行。
+- **按编号接受/拒绝修改** — `nw diff apply --accept 01,03 --reject 02` 生成 `author.v2.md` 与 `decision_log.md`，不覆盖作者原稿。
+- **新增场景卡工具** — `core.scene_cards` + `scripts/scene_card.py` + `nw scene`，生成和列出 Markdown 场景卡。
+- **新增角色声音实验室** — `core.voice_lab` + `scripts/voice_lab.py` + `nw voice-lab`，生成会说/不会说/泄密风险测试任务包。
+- **新增导出工具** — `core.exporter` + `scripts/export_book.py` + `nw export`，无依赖导出 Markdown、简版 DOCX 和简版 EPUB。
+
+### 本地入口与协议化
+
+- **新增 `nw` 统一入口** — 支持 `doctor`、`dashboard`、`gatekeeper`、`diff generate/show/apply`、`scene`、`voice-lab` 和 `export`。
+- **新增 Python 项目元数据** — `pyproject.toml` 声明 Python 版本、PyYAML 运行依赖、pytest 测试依赖和 `nw` console script。
+- **JSON 协议输出** — Dashboard、Gatekeeper、diff generate/apply 支持结构化输出，便于未来 TypeScript core、API 服务层和客户端复用。
+
+### 测试覆盖
+
+- **新增 Dashboard 测试** — 验证 Dashboard 协议数据和 Markdown 输出。
+- **新增 diff workflow 测试** — 验证候选生成、单条显示、接受/拒绝应用和决策日志。
+- **新增 v0.5 作者工具测试** — 验证场景卡、角色声音实验室和 DOCX/EPUB 导出。
+
+---
+
 ## v0.4.0 — 架构优化与工作流增强
 
 ### Core 模块体系

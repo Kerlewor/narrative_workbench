@@ -1,6 +1,7 @@
 # Python
 __pycache__/
 *.py[cod]
+*.egg-info/
 
 # OS
 .DS_Store
@@ -27,6 +28,15 @@ story/ledger/*.jsonl
 # Template scaffolds (_*.md) are tracked; generated output (*.md) is not
 story/views/*.md
 !story/views/_*.md
+
+# Generated dashboard and layered co-writing diff artifacts
+story/DASHBOARD.md
+story/runtime/chapter-*.diff_index.md
+story/runtime/chapter-*.patch_candidates.jsonl
+story/runtime/chapter-*.decision_log.md
+story/runtime/voice_lab.*.md
+story/runtime/diffs/
+exports/
 
 # Generated plan artifacts (project-specific — keep templates)
 story/plans/chapter-*.yaml

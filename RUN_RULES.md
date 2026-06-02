@@ -26,6 +26,11 @@
 | `skill_check.py` | AI 检查 skill 注册表表头、名称合法性和入口文件存在性 |
 | `context_builder.py` | AI 按 Agent 类型手动收集必读文件、压缩摘要、排除文件，构建上下文包 |
 | `prompt_compiler.py` | AI 按三层结构手动拼接 Agent prompt |
+| `dashboard.py` | AI 手动汇总当前进度、到期伏笔、知识边界、时间线风险和下一步建议，写入 `story/DASHBOARD.md` |
+| `diff_workflow.py` / `nw diff` | AI 手动维护修改候选编号、索引、单条详情、接受/拒绝决策和新版本输出 |
+| `scene_card.py` / `nw scene` | AI 手动创建或列出场景卡，并把自然语言修改落实到 Markdown 场景卡 |
+| `voice_lab.py` / `nw voice-lab` | AI 手动生成角色声线测试任务包，输出会说/不会说的候选检查要求 |
+| `export_book.py` / `nw export` | AI 手动收集正式章节并导出 Markdown、DOCX 或 EPUB |
 | 其余新脚本 | AI 执行等效的手动检查或分析 |
 
 降级模式下的产物应写入与脚本相同的 runtime 路径，并标注 `(manual)` 以区分。
@@ -52,6 +57,12 @@
 | 更新视图 | `python scripts/render_views.py all` | `story/views/*.md` |
 | 同步 Skills | `python scripts/sync_skills.py` | `.claude/skills/` + `.agents/skills/` |
 | 章节导演表 | `python scripts/director_sheet.py --chapter N --from-template` | `story/plans/chapter_NNNN_director_sheet.yaml` |
+| 更新写作控制台 | `python scripts/dashboard.py` 或 `python scripts/nw dashboard` | `story/DASHBOARD.md` |
+| 生成共创 diff | `python scripts/nw diff generate --chapter N --original <作者稿> --revised <候选润色稿>` | `chapter-000N.diff_index.md` + `patch_candidates.jsonl` |
+| 应用共创 diff | `python scripts/nw diff apply --chapter N --accept 01,03 --reject 02` | `chapters/drafts/chapter-000N.author.v2.md` + `decision_log.md` |
+| 创建场景卡 | `python scripts/nw scene create --chapter N --id scene_01 --title 标题` | `story/plans/scenes/chapter-000N/scene_01.md` |
+| 角色声音实验 | `python scripts/nw voice-lab --character 角色名 --line 台词` | `story/runtime/voice_lab.角色名.md` |
+| 导出成书 | `python scripts/nw export --format docx --output exports/book.docx` | `exports/` 或指定路径 |
 
 ## 脚本职责
 
@@ -81,6 +92,12 @@
 | `render_views.py` | 从 JSONL 账本渲染作者可读 Markdown 视图 | 不做语义分析 |
 | `director_sheet.py` | 生成和验证章节导演表 | 不做创作决策 |
 | `sync_skills.py` | 将 skills/ 同步到 .claude/skills/ 和 .agents/skills/ 平台入口 | 不维护重复内容 |
+| `dashboard.py` | 生成 Markdown-native 写作控制台与 JSON 协议摘要 | 不替代作者判断故事下一步 |
+| `diff_workflow.py` | 生成分层 diff 索引、单条详情、JSONL 修改候选，并按编号应用作者决策 | 不替代作者判断是否采纳修改 |
+| `nw` | 统一本地入口，封装 doctor/dashboard/gatekeeper/diff 等常用命令 | 不替代 Claude Code/Codex 的创作调度 |
+| `scene_card.py` | 创建和列出 Markdown 场景卡 | 不替代作者/主会话设计场景内容 |
+| `voice_lab.py` | 生成角色声线实验任务包 | 不替代作者确认角色声音 |
+| `export_book.py` | 将正式章节导出为 Markdown、DOCX 或 EPUB | 不替代专业排版软件 |
 
 ## 失败处理
 

@@ -15,6 +15,94 @@ python scripts/create_project.py "我的新小说" --target /path/to/books
 - 生成新项目介绍文件 `PROJECT.md`。
 - 避免直接污染 `_frameworks/narrative_workbench` 模板目录。
 
+## nw
+
+```bash
+python scripts/nw doctor
+python scripts/nw dashboard
+python scripts/nw gatekeeper --chapter 12 --stage final
+python scripts/nw diff generate --chapter 12 --original chapters/drafts/chapter-0012.author.md --revised story/runtime/chapter-0012.polish.md
+python scripts/nw diff show --chapter 12 --id 03
+python scripts/nw diff apply --chapter 12 --accept 01,03 --reject 02
+python scripts/nw scene create --chapter 12 --id scene_01 --title "旧站台入口"
+python scripts/nw voice-lab --character 林安 --line "你为什么知道这块雪牌？"
+python scripts/nw export --format docx --output exports/book.docx
+```
+
+用途：
+
+- 统一本地入口，优先服务普通作者和未来 UI。
+- 保留 `scripts/*.py` 的传统调用方式，Claude Code / Codex 仍可直接运行单个脚本。
+- 支持 JSON 协议输出，便于后续 TypeScript core、API 服务层和客户端复用。
+
+## dashboard.py
+
+```bash
+python scripts/dashboard.py
+python scripts/dashboard.py --json
+python scripts/nw dashboard
+```
+
+用途：
+
+- 生成 `story/DASHBOARD.md` 写作控制台。
+- 汇总当前章节、上一章、到期伏笔、未揭示秘密、时间线风险和可直接输入的操作。
+- 对话窗口只显示摘要，详细状态留在 Markdown 文件中。
+
+## diff_workflow.py
+
+```bash
+python scripts/diff_workflow.py generate --chapter 12 --original chapters/drafts/chapter-0012.author.md --revised story/runtime/chapter-0012.polish.md
+python scripts/diff_workflow.py show --chapter 12 --id 03
+python scripts/diff_workflow.py apply --chapter 12 --accept 01,03 --reject 02
+```
+
+用途：
+
+- 生成 `chapter-XXXX.diff_index.md` 可读索引。
+- 生成 `story/runtime/diffs/chapter-XXXX/patch-XXXX.md` 单条修改详情。
+- 生成 `chapter-XXXX.patch_candidates.jsonl` 执行数据。
+- 按编号接受/拒绝修改，输出 `chapters/drafts/chapter-XXXX.author.v2.md` 和 `decision_log.md`。
+
+## scene_card.py
+
+```bash
+python scripts/scene_card.py create --chapter 12 --id scene_01 --title "旧站台入口" --pov 林安 --characters 林安,周月
+python scripts/scene_card.py list --chapter 12
+```
+
+用途：
+
+- 在 `story/plans/scenes/chapter-XXXX/` 下生成 Markdown 场景卡。
+- 场景卡保留 structured frontmatter，供 Relevance Resolver 和主会话读取。
+- 自然语言编辑由 Claude Code/Codex 落到 Markdown 文件，不需要独立 UI。
+
+## voice_lab.py
+
+```bash
+python scripts/voice_lab.py --character 林安 --line "你为什么知道这块雪牌？"
+```
+
+用途：
+
+- 生成 `story/runtime/voice_lab.角色名.md`。
+- 读取角色卡摘录，构造"会说/不会说/泄密风险"测试任务。
+- 输出只作为候选，作者确认后才写入角色卡或正文。
+
+## export_book.py
+
+```bash
+python scripts/export_book.py --format markdown --output exports/book.md
+python scripts/export_book.py --format docx --output exports/book.docx
+python scripts/export_book.py --format epub --output exports/book.epub
+```
+
+用途：
+
+- 按章节文件名顺序收集 `chapters/*.md`。
+- 使用标准库生成 Markdown、简版 DOCX 和简版 EPUB。
+- 面向交付预览，不替代专业出版排版。
+
 ## doctor.py
 
 运行：

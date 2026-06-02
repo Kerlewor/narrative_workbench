@@ -99,33 +99,19 @@ def _chunk_text(text: str, max_chunk_chars: int = 8000) -> list[str]:
     return chunks
 
 
-def _build_fulltext_section(text: str, max_total_chars: int = 50000) -> str:
+def _build_fulltext_section(text: str) -> str:
     """Build the full-text section with chunking and warnings.
 
     For short texts (< 8000 chars), return the full text unmodified.
-    For longer texts, chunk by paragraph with IDs, and warn if
-    exceeding max_total_chars.
+    For longer texts, chunk by paragraph with IDs. No chapter text is
+    silently truncated; oversized chapters should be reviewed chunk by
+    chunk and then passed through a full-chapter coherence pass.
     """
     if len(text) <= 8000:
         return text
 
     chunks = _chunk_text(text)
     total_chars = len(text)
-
-    if total_chars > max_total_chars:
-        truncated = text[:max_total_chars]
-        last_break = truncated.rfind("\n\n")
-        if last_break > 0:
-            truncated = truncated[:last_break]
-        included_chunks = _chunk_text(truncated)
-        warning = (
-            f"⚠ **正文过长警告**: 全文共 {total_chars} 字符，已截取前 {max_total_chars} 字符 "
-            f"（{len(included_chunks)} 个分块）。剩余约 {total_chars - max_total_chars} 字符未包含。\n"
-            f"建议对超长章节分批次审查。\n\n"
-            f"---\n\n"
-        )
-        return warning + "\n\n".join(included_chunks)
-
     header = (
         f"全文共 {total_chars} 字符，{len(chunks)} 个分块。"
         f"每块保留段落 ID 范围以供定位。\n\n"

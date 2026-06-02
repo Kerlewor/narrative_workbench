@@ -106,28 +106,18 @@ def _chunk_text(text: str, max_chunk_chars: int = 8000) -> list[str]:
     return chunks
 
 
-def _build_fulltext_section(text: str, max_total_chars: int = 50000) -> str:
-    """Build the full-text section with chunking and warnings."""
+def _build_fulltext_section(text: str) -> str:
+    """Build the full-text section with paragraph-preserving chunks.
+
+    No chapter text is silently truncated. Long chapters are split into
+    addressable chunks and should receive a full-chapter rhythm pass after
+    local polishing.
+    """
     if len(text) <= 8000:
         return text
 
     chunks = _chunk_text(text)
     total_chars = len(text)
-
-    if total_chars > max_total_chars:
-        truncated = text[:max_total_chars]
-        last_break = truncated.rfind("\n\n")
-        if last_break > 0:
-            truncated = truncated[:last_break]
-        included_chunks = _chunk_text(truncated)
-        warning = (
-            f"⚠ **正文过长警告**: 全文共 {total_chars} 字符，已截取前 {max_total_chars} 字符 "
-            f"（{len(included_chunks)} 个分块）。剩余约 {total_chars - max_total_chars} 字符未包含。\n"
-            f"建议对超长章节分批次润色。\n\n"
-            f"---\n\n"
-        )
-        return warning + "\n\n".join(included_chunks)
-
     header = (
         f"全文共 {total_chars} 字符，{len(chunks)} 个分块。"
         f"每块保留段落 ID 范围以供定位。\n\n"
@@ -192,6 +182,7 @@ def main() -> int:
     lines.append("- 标注所有改动的位置和原因。")
     lines.append("- 不改情节、不改角色选择、不新增事实。")
     lines.append("- 不确定时保留原文。")
+    lines.append("- 长章节按段落分块处理后，必须保留全章节奏曲线，避免每一段都被润色成同一种强度。")
     lines.append("")
 
     if args.output:
