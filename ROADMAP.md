@@ -390,23 +390,28 @@ chapter_019/
 
 **此版完成后：项目从"提示词框架"升级为"小说上下文引擎"，具备分场景写作+全章统筹的完整能力，且在 Claude Code 和 Codex 上均为原生可调用。**
 
-### v0.4：核心引擎封装 + 统一运行入口
+### v0.4：内部架构优化与工作流增强
 
-> 详细设计见 `/home/kerlewor/codex-safe/books/_frameworks/v0.3.0改进路线图`
+> **本版本仍面向 Claude Code / Codex 用户，提供优化后的脚本与 Agent 工作流，不提供独立 CLI 或普通作者安装版本。**
 
-**核心目标：** 将 v0.3.0 的 25 个独立脚本抽象为可复用的 `core/` 模块，新建统一 CLI 入口，封装模型调用接口（摆脱对 Claude Code/Codex 的硬依赖），最终通过 PyInstaller 打包为无需 Python 环境的可执行程序。
+**核心目标：** 将 v0.3.0 的 25 个独立脚本抽象为可复用的 `core/` 模块体系，提升代码可维护性与测试覆盖，增强 Claude Code / Codex 工作流的稳定性。不引入独立 CLI、多模型 Provider 或 PyInstaller 打包。
 
 **架构变更：**
-- 新增 `core/` — 10+ 个纯 Python 模块（project/chapter/context/ledger/hooks/style/knowledge/doctor/gatekeeper/providers）
-- 新增 `cli/` — 统一 CLI 入口（`nw project create`, `nw chapter run`, `nw hook report` 等）
-- 新增 `core/providers/` — 模型调用抽象层（Anthropic + OpenAI + DeepSeek）
-- `scripts/` 保留为 thin wrapper（Agent 用户零影响）
+- 新增 `core/` — 纯 Python 模块（project/chapter/context/ledger/hooks/style/knowledge/doctor/gatekeeper），将脚本中的可复用逻辑抽取为模块化组件
+- `scripts/` 保留为面向 Claude Code / Codex Agent 的调用入口，内部委托 `core/` 模块
+- 扩展 `tests/` 回归测试覆盖范围：账本 CRUD、上下文预算、导演表校验、门禁 smoke test
 
-**向后兼容：** Claude Code / Codex Agent 用户的所有命令和路径不变。`scripts/` 内部改为 `from core import ...` 委托调用。
+**稳定性与工作流增强：**
+- 改进跨章节上下文完整性：Agent 会话恢复时从结构化账本重建状态，降低会话记忆衰减风险
+- 增强脚本异常处理：所有脚本在无 Python 环境时提供清晰的降级说明
+- 场景接力卡自动校验：检测上一场景输出状态与下一场景输入要求的不一致
+- 门禁脚本（gatekeeper.py）覆盖更多确定性检查项
+
+**向后兼容：** Claude Code / Codex Agent 用户的所有命令、路径和调用方式不变。
 
 ### v0.5：作者体验增强（全 Markdown-native）
 
-> 原 v0.4.0 计划中的作者功能顺延至 v0.5.0。v0.4.0 的 core/ 封装为这些功能提供更快的实现基础。
+> 原 v0.4.0 计划中的作者功能顺延至 v0.5.0。v0.4.0 的 core/ 模块化为这些功能提供了更清晰的实现基础。
 
 **写作控制台与看板：** `story/DASHBOARD.md` 自动生成、伏笔看板 + 角色知识边界矩阵 + 时间线冲突检查
 
@@ -935,7 +940,7 @@ Reviewer 读取完整正文 + 导演表 + 相关角色状态 + 相关伏笔与�
 
 #### 断层 3：AI 模型调用硬依赖 Claude Code/Codex
 
-核心创作流水线（Writer → Polish → Review → Fixer → Gatekeeper）依赖 Claude Code 的 subagent 体系和对话外壳。v0.4.0 计划的 `core/providers/` 模型调用抽象层尚未构建。鸿蒙 app 中调用 LLM 需解决：API Key 管理、流式输出、上下文窗口管理（写一章需 8000+ token 上下文包）、网络稳定性、费用控制。
+核心创作流水线（Writer → Polish → Review → Fixer → Gatekeeper）依赖 Claude Code 的 subagent 体系和对话外壳。项目目前没有独立的模型调用抽象层。鸿蒙 app 中调用 LLM 需解决：API Key 管理、流式输出、上下文窗口管理（写一章需 8000+ token 上下文包）、网络稳定性、费用控制。
 
 #### 断层 4：交互范式根本不同
 
@@ -954,13 +959,13 @@ v0.3.0 ✅ 已完成
   平台原生化 + 上下文引擎重构
   25 个脚本、JSONL 账本、Relevance Resolver
 
-v0.4.0 🚧 计划中 —— App 化的硬前提
-  core/ 模块体系（10+ 模块）
-  nw 统一 CLI 入口
-  core/providers/ 模型调用抽象层（Anthropic/OpenAI/DeepSeek）
-  摆脱对 Claude Code/Codex 的硬依赖
-  PyInstaller 打包 + PyPI 发布
-  scripts/ 改为 thin wrapper，委托 core/
+v0.4.0 🚧 计划中 —— 架构优化与稳定性增强
+  core/ 模块体系，抽取可复用逻辑
+  scripts/ 委托 core/，调用方式不变
+  扩展回归测试覆盖
+  跨章节上下文完整性改进
+  异常处理与降级说明增强
+  面向 CC/Codex 用户，无独立 CLI
 
 v0.5.0 📋 规划中 —— App UI 的设计参考源
   story/DASHBOARD.md 写作控制台
@@ -1015,11 +1020,12 @@ v0.7.0 开源 📋                     章节版本云端存储
 | 条件 | 状态 | 说明 |
 |---|---|---|
 | v0.4.0 `core/` 模块化完成 | 必须 | 确保逻辑可复用、接口清晰，ArkTS 重写或 API 封装有据可依 |
-| v0.4.0 模型抽象层完成 | 必须 | 确定 app 端 LLM 调用架构——直连 API 还是自建后端中转 |
 | v0.5.0 Dashboard 验证完成 | 必须 | 验证作者真正需要看什么信息、做什么操作，再翻译成 ArkUI |
 | v0.5.0 结构化 diff 验证完成 | 必须 | 验证触屏端"接受/拒绝修改"的交互逻辑 |
 | v0.5.0 场景卡编排验证完成 | 建议 | 为移动端拖拽编排提供交互原型 |
 | Python 后端 vs 纯客户端决策 | 必须 | 在 v0.5.0 完成后做最终架构决策 |
+
+> **AGPL 合规提醒：** 闭源线需在独立仓库中从零构建，不得包含本仓库的 AGPL-3.0 代码。建议闭源线以商业许可发布，仅通过 API 调用开源版本的核心功能，或对开源部分采用洁净室独立实现。在未取得本仓库全部贡献者的 CLA 授权之前，不得将第三方贡献代码纳入闭源版本。
 
 **底线建议：** 不要在 v0.5.0 完成之前启动鸿蒙 app 的实际开发。v0.4.0 确保逻辑可复用，v0.5.0 在 Markdown-native 层面验证全部交互模型。这两步走完后，鸿蒙 app 就是一个"对着已验证的后端 API 和交互逻辑写 ArkUI 客户端"的常规工程问题，而不是需要同时解决框架重构 + 平台迁移 + UI 设计 + 交互验证的巨型风险项目。
 
@@ -1028,6 +1034,6 @@ v0.7.0 开源 📋                     章节版本云端存储
 > 创建日期：2026-05-29
 > 最后更新：2026-06-02（新增第十一节：鸿蒙 App 化路线图，v0.6.0 起双线并行）
 > 本文档整合了三份分析材料（核心诊断与提示词工程重构 / 平台定位与 TUI 判断 / 分段处理与全章统筹），覆盖 v0.2.2 → v0.3 → v0.4 → v0.5 四阶段版本路线。
-> v0.2.2 和 v0.3.0 已交付。下一阶段：v0.4.0 核心引擎封装。
+> v0.2.2 和 v0.3.0 已交付。下一阶段：v0.4.0 架构优化与工作流增强。
 > v0.6.0 起分为开源线（本仓库持续迭代）和闭源线（API 服务 + 鸿蒙 App，独立仓库）。
 > 旧版路线图已废弃。
