@@ -368,9 +368,7 @@ AI:   [decompose_style.py --input chapters/drafts/chapter-0001.author.md] →
 
 ## 更新计划
 
-当前版本：**v0.3.0**。v0.2.0 为全面运行时升级。v0.3.0 已完成 Context Engine 重构与平台原生化，后续 **v0.4.0** 将聚焦内部架构优化与工作流增强，仍面向 Claude Code / Codex 用户。
-
-**v0.6.0 起双线并行：** 开源线在本仓库持续迭代写作工作流、角色工具和社区生态；闭源线在独立仓库开发 API 服务层与鸿蒙 App，面向不想配置命令行的终端消费者。详见 ROADMAP.md 第十一节。
+当前版本：**v0.3.0**。后续 **v0.4.0** 聚焦内部架构优化与工作流增强（仍面向 Claude Code / Codex 用户），**v0.5.0** 补齐作者体验功能（Dashboard、diff 报告、场景卡编排等），**v0.6.0 起双线并行**——开源线在本仓库持续迭代，闭源线在独立仓库开发 API 服务层与鸿蒙 App。详见 [ROADMAP.md](ROADMAP.md)。
 
 详细路线图见 **[ROADMAP.md](ROADMAP.md)**（约 600 行，涵盖核心诊断、版本路线、难度评估、产品定位与实现方案）。
 
