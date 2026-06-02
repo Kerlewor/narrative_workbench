@@ -389,7 +389,7 @@ v0.3.0 完成了平台原生化（Claude Code + Codex 双入口）。v0.4.0 已�
 ## 深入阅读
 
 - [CLAUDE.md](CLAUDE.md) — 完整工作流协议与 Agent 架构
-- [ROADMAP.md](ROADMAP.md) — v0.3.0+ 详细改进路线图（核心诊断、版本路线、难度评估、实现方案）
+- [ROADMAP.md](ROADMAP.md) — v0.4.0+ 详细改进路线图（核心诊断、版本路线、难度评估、实现方案）
 - [PROJECT_INTRO.md](PROJECT_INTRO.md) — 系统设计理念与组件说明
 - [ORIGIN.md](ORIGIN.md) — InkOS lineage、借鉴清单、独立构建内容、架构对比
 - [story/system_protocol.md](story/system_protocol.md) — 系统边界、状态机、反馈回路、定稿门禁
