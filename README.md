@@ -2,7 +2,7 @@
 
 面向 Claude Code 与 Codex CLI 的长篇 AI 小说工程框架。为长篇小说提供状态管理、伏笔追踪、角色一致性审查、文风对齐和 AI 辅助流水线——让作者把小说创作当成工程来管理，无论是让 AI 全流程写到完结，还是在关键章节亲自执笔。
 
-支持两种创作模式：**AI 流水线写作**（规划→起草→润色→审阅→修复）和**共创模式**（作者手写 + AI 审查 + AI 按需介入润色）。31 个确定性 Python 脚本负责检查、索引、门禁、Dashboard、分层 diff、场景卡、角色声线实验和导出，AI 负责创作判断。
+支持两种创作模式：**AI 流水线写作**（规划→起草→润色→审阅→修复）和**共创模式**（作者手写 + AI 审查 + AI 按需介入润色）。31 个确定性脚本与本地入口负责检查、索引、门禁、Dashboard、分层 diff、场景卡、角色声线实验和导出，AI 负责创作判断。
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Claude%20Code%20%7C%20Codex%20CLI-green)
@@ -34,7 +34,7 @@
 - **完整状态机：** 10 状态章节生命周期，含 `needs-rewrite` 和 `needs-repair` 显式失败回路。
 - **Hook 伏笔系统：** open / advance / escalate / resolve / defer 全生命周期 + 半衰期防遗忘 + 活跃预算控制。
 - **去 AI 味管线：** style_blacklist 负面清单 + scene-beat 场景拆解 + Polish 润色层。
-- **Skill 可插拔扩展 + Python 辅助体检：** 注册制 skill 系统 + 31 个确定性脚本（上下文工程、流程门禁、知识索引、文风分析、漂移检测、文风拆解、项目迁移、Dashboard、分层 diff、导出）。
+- **Skill 可插拔扩展 + Python 辅助体检：** 注册制 skill 系统 + 31 个确定性脚本与本地入口（上下文工程、流程门禁、知识索引、文风分析、漂移检测、文风拆解、项目迁移、Dashboard、分层 diff、导出）。
 
 ## 快速开始
 
@@ -196,9 +196,17 @@ story/runtime/chapter-0005.decision_log.md        # 作者决策记录
 | **有 Python 3 环境** | 31 个脚本负责文件完整性、JSON 合法性、hook 半衰期、文本审计、Dashboard、分层 diff、场景卡、角色声线实验和导出等确定性工作，AI 负责创作判断 |
 | **无 Python 或不使用** | AI 手动执行等效检查（逐项验证文件、计算半衰期、扫描禁止模式等），产物标注 `(manual)`，功能完整但可靠性略低于脚本 |
 
+建议安装方式：
+
+```bash
+python -m pip install -e ".[test]"
+```
+
+这会安装运行所需的 `PyYAML` 和测试所需的 `pytest`，并注册 `nw` 本地命令。也可以继续使用 `python scripts/nw ...` 的仓库内入口。
+
 ### 脚本分类
 
-31 个 Python 脚本按功能分为七组：
+31 个确定性脚本与本地入口按功能分为七组：
 
 | 类别 | 脚本 | 说明 |
 |---|---|---|
@@ -269,7 +277,7 @@ story/
   state/           JSON 状态镜像
   style_samples/   用户风格样本
 skills/            可插拔 skill 接口与注册表（正式来源）
-scripts/           31 个 Python 确定性辅助脚本
+scripts/           31 个确定性辅助脚本与本地入口
 chapters/          正文章节（000N_标题.md）
 tests/             回归测试
 ```
@@ -392,9 +400,9 @@ AI:   [decompose_style.py --input chapters/drafts/chapter-0001.author.md] →
 
 ## 更新计划
 
-当前版本：**v0.5.0**。本版本完成 Markdown-native 作者体验增强：`story/DASHBOARD.md` 写作控制台、分层共创 diff、场景卡、角色声音实验室、EPUB/DOCX/Markdown 导出、`nw` 本地入口和 core JSON I/O 协议。项目仍面向 Claude Code / Codex 用户，不提供独立图形界面。**v0.6.0 起双线并行**——开源线在本仓库持续迭代，闭源线在独立仓库开发 API 服务层与鸿蒙 App。详见 [ROADMAP.md](ROADMAP.md)。
+当前版本：**v0.5.0**。本版本完成 Markdown-native 作者体验增强：`story/DASHBOARD.md` 写作控制台、分层共创 diff、场景卡、角色声音实验室、EPUB/DOCX/Markdown 导出、`nw` 本地入口和结构化 JSON 输出。项目仍面向 Claude Code / Codex 用户，不提供独立图形界面。
 
-详细路线图见 **[ROADMAP.md](ROADMAP.md)**（约 600 行，涵盖核心诊断、版本路线、难度评估、产品定位与实现方案）。
+详细路线图见 **[ROADMAP.md](ROADMAP.md)**（涵盖核心诊断、版本路线、产品定位与实现方案）。
 
 ### 版本概览
 
@@ -403,17 +411,17 @@ AI:   [decompose_style.py --input chapters/drafts/chapter-0001.author.md] →
 | **v0.2.2** | 正确性修复 | prompt_compiler bug 修复、Context Builder 精准筛选、5000 字符截断修复（已在 v0.3.0 中完成） | ✅ 已完成 |
 | **v0.3** | 平台原生化 + Context Engine | CLAUDE.md 精简/AGENTS.md 新增、结构化账本（JSONL+Views）、Relevance Resolver、Skills 同步、章节导演表+接力卡 | ✅ 已完成 |
 | **v0.4** | 架构优化与工作流增强 | core/ 模块体系、回归测试扩展、跨章节上下文完整性改进、异常处理增强。面向 CC/Codex 用户，无独立 CLI | ✅ 已完成 |
-| **v0.5** | 作者体验增强 + 无依赖开源体验 | 写作控制台（DASHBOARD）、分层 diff 报告、场景卡、角色声音实验室、版本化候选稿与决策日志、文笔拆解、EPUB/DOCX/Markdown 导出、`nw` 本地入口、core JSON I/O 协议 | ✅ 已完成 |
-| **v0.6+** | 双线并行 | 开源线：场景卡交互增强、社区 Skill 市场、多语言支持。闭源线：API 服务层 + 鸿蒙 App（独立仓库） | 规划中 |
+| **v0.5** | 作者体验增强 + 本地入口 | 写作控制台（DASHBOARD）、分层 diff 报告、场景卡、角色声音实验室、版本化候选稿与决策日志、文笔拆解、EPUB/DOCX/Markdown 导出、`nw` 本地入口、结构化 JSON 输出 | ✅ 已完成 |
+| **v0.6+** | 开源线持续迭代 | 场景卡交互增强、角色工具完善、社区 Skill 生态、多语言支持、第三方 AI 平台适配 | 规划中 |
 
 ### 产品定位
 
-v0.3.0 完成了平台原生化（Claude Code + Codex 双入口）。v0.4.0 已完成内部架构优化——通过 `core/` 模块体系提升代码可维护性与测试覆盖，同时保持 Claude Code / Codex Agent 用户的所有调用方式不变。v0.5.0 完成作者体验增强后，自 v0.6.0 起项目分为双线发展——开源线持续迭代写作工作流与社区生态，闭源线开发 API 服务层与鸿蒙 App（独立仓库，需遵守 AGPL 合规条件）。详见 [ROADMAP.md](ROADMAP.md)。
+v0.3.0 完成了平台原生化（Claude Code + Codex 双入口）。v0.4.0 完成内部架构优化，通过 `core/` 模块体系提升代码可维护性与测试覆盖，同时保持 Claude Code / Codex Agent 用户的调用方式不变。v0.5.0 在此基础上补齐 Markdown-native 作者体验，后续开源版本继续迭代写作工作流、角色工具和 Skill 生态。详见 [ROADMAP.md](ROADMAP.md)。
 
 ## 深入阅读
 
 - [CLAUDE.md](CLAUDE.md) — 完整工作流协议与 Agent 架构
-- [ROADMAP.md](ROADMAP.md) — v0.4.0+ 详细改进路线图（核心诊断、版本路线、难度评估、实现方案）
+- [ROADMAP.md](ROADMAP.md) — v0.5.0+ 详细改进路线图（核心诊断、版本路线、产品定位、实现方案）
 - [PROJECT_INTRO.md](PROJECT_INTRO.md) — 系统设计理念与组件说明
 - [ORIGIN.md](ORIGIN.md) — InkOS lineage、借鉴清单、独立构建内容、架构对比
 - [story/system_protocol.md](story/system_protocol.md) — 系统边界、状态机、反馈回路、定稿门禁
