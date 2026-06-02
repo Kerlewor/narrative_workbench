@@ -34,9 +34,15 @@
 - **完整状态机：** 10 状态章节生命周期，含 `needs-rewrite` 和 `needs-repair` 显式失败回路。
 - **Hook 伏笔系统：** open / advance / escalate / resolve / defer 全生命周期 + 半衰期防遗忘 + 活跃预算控制。
 - **去 AI 味管线：** style_blacklist 负面清单 + scene-beat 场景拆解 + Polish 润色层。
-- **Skill 可插拔扩展 + Python 辅助体检：** 注册制 skill 系统 + 31 个确定性脚本与本地入口（上下文工程、流程门禁、知识索引、文风分析、漂移检测、文风拆解、项目迁移、Dashboard、分层 diff、导出）。
+- **Skill 可插拔扩展 + 本地确定性工具：** 注册制 skill 系统 + 31 个确定性工具与 `nw` 本地入口（上下文工程、流程门禁、知识索引、文风分析、漂移检测、文风拆解、项目迁移、Dashboard、分层 diff、导出）。
 
 ## 快速开始
+
+如果你准备在本机长期使用，建议先安装本地命令：
+
+```bash
+python -m pip install -e ".[test]"
+```
 
 在项目目录中打开 Claude Code，说：
 
@@ -51,7 +57,7 @@ AI: [加载完成] 当前是模板目录。要创建新项目吗？告诉我书�
 
 你: 创建项目"临安雪"
 
-AI: [运行 create_project.py] 项目已创建。要开始搭建大纲吗？
+AI: [运行 scripts/create_project.py] 项目已创建。要开始搭建大纲吗？
 
 你: 搭建大纲                                      # 五阶段从零搭建
 你: 写第1章                                       # 完整流水线
@@ -62,7 +68,7 @@ AI: [运行 create_project.py] 项目已创建。要开始搭建大纲吗？
 
 如果只想先看看项目长什么样，打开 [`examples/linan_snow_demo/`](examples/linan_snow_demo/)——它是一个完整的最小演示项目，包含角色卡、伏笔池、intent/plan 和一篇手写稿，可以直接跑脚本验证。
 
-> **Windows 用户：** Claude Code 和 Codex 在 Windows 上通过 WSL 或 Git Bash 运行，脚本命令与 Linux/macOS 完全一致。如果在原生 Windows 终端手动运行脚本，将 `python3` 替换为 `python`。所有 `&&` 在 CMD 中无效，请逐行运行。
+> **Windows 用户：** Claude Code 和 Codex 在 Windows 上通过 WSL 或 Git Bash 运行，命令与 Linux/macOS 完全一致。安装本项目后优先使用 `nw`。少数模板初始化和知识索引工具仍保留为仓库脚本；如果在原生 Windows 终端手动运行这些脚本，将 `python3` 替换为 `python`。所有 `&&` 在 CMD 中无效，请逐行运行。
 
 ## 用户命令
 
@@ -167,12 +173,18 @@ skill 输出进入 story/runtime/chapter-000N.skill-SKILLNAME.md
 共创润色不把全部修改塞进对话上下文。Claude Code / Codex 只显示修改总览和下一步操作，完整内容写入 Markdown，真正可执行的修改候选写入 JSONL：
 
 ```bash
-python scripts/nw diff generate --chapter 5 \
+nw diff generate --chapter 5 \
   --original chapters/drafts/chapter-0005.author.md \
   --revised story/runtime/chapter-0005.polish.md
 
-python scripts/nw diff show --chapter 5 --id 03
-python scripts/nw diff apply --chapter 5 --accept 01,03 --reject 02
+nw diff show --chapter 5 --id 03
+nw diff apply --chapter 5 --accept 01,03 --reject 02
+```
+
+未安装本项目时，可以用仓库内兼容入口执行同样命令：
+
+```bash
+python scripts/nw diff generate --chapter 5 --original chapters/drafts/chapter-0005.author.md --revised story/runtime/chapter-0005.polish.md
 ```
 
 产物：
@@ -185,7 +197,7 @@ chapters/drafts/chapter-0005.author.v2.md         # 应用后的新版本
 story/runtime/chapter-0005.decision_log.md        # 作者决策记录
 ```
 
-## Python 辅助脚本
+## 本地命令与脚本
 
 ### 环境检测
 
@@ -202,11 +214,28 @@ story/runtime/chapter-0005.decision_log.md        # 作者决策记录
 python -m pip install -e ".[test]"
 ```
 
-这会安装运行所需的 `PyYAML` 和测试所需的 `pytest`，并注册 `nw` 本地命令。也可以继续使用 `python scripts/nw ...` 的仓库内入口。
+这会安装运行所需的 `PyYAML` 和测试所需的 `pytest`，并注册 `nw` 本地命令。安装后，常用命令应写成：
+
+```bash
+nw doctor
+nw dashboard
+nw gatekeeper --chapter 12 --stage final
+nw diff generate --chapter 12 --original chapters/drafts/chapter-0012.author.md --revised story/runtime/chapter-0012.polish.md
+nw scene create --chapter 12 --id scene_01 --title "旧站台入口"
+nw voice-lab --character 林安 --line "你为什么知道这块雪牌？"
+nw export --format docx --output exports/book.docx
+```
+
+如果没有安装本项目，也可以继续使用仓库内入口：
+
+```bash
+python scripts/nw doctor
+python scripts/nw dashboard
+```
 
 ### 脚本分类
 
-31 个确定性脚本与本地入口按功能分为七组：
+31 个确定性工具按功能分为七组。安装后，作者体验类命令优先通过 `nw` 调用；模板创建、知识索引、迁移、Skill 校验等工具继续保留脚本入口，方便 AI 会话按需直接调用。
 
 | 类别 | 脚本 | 说明 |
 |---|---|---|
