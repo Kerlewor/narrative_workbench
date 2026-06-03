@@ -108,33 +108,20 @@ tests/                    回归测试
 
 ## 4. 启动方式
 
-推荐做法：
+推荐的启动只需自然语言对话：
 
-1. 在模板目录运行 `python scripts/create_project.py "新书名"`。
-2. 进入生成的新书目录。
-3. 从新书目录根部启动 Claude Code。
-4. 让 AI 先读取 `START_HERE.md` 和 `CLAUDE.md`。
-5. 如可用，先调用 `project-librarian` 生成 Context Packet。
-6. 如果是新项目，对 AI 说：`搭建大纲`。
-7. 大纲完成后运行：
+1. 在模板目录对 AI 说：`创建新项目"书名"`（AI 会自动运行 `create_project.py`）。
+2. 进入生成的新书目录，启动 Claude Code。
+3. AI 会自动读取 `START_HERE.md` 和 `CLAUDE.md`，调用 `project-librarian` 生成上下文包。
+4. 如果是新项目，对 AI 说：`搭建大纲`。
+5. 大纲完成后 AI 会自动运行体检和结构检查。
+6. 然后开始：`写第1章`、`继续下一章`、`写接下来5章`、`审阅第N章`。
 
-```bash
-python scripts/doctor.py
-python scripts/structure_report.py
-```
-
-8. 然后开始：
-
-```text
-写第1章
-继续下一章
-写接下来5章
-审阅第N章
-```
+以上所有 Python 脚本由 AI 自动调用，用户无需手动执行。
 
 ## 5. 大纲搭建流程
 
-大纲搭建由 `CLAUDE.md` 和 `story/outline/_template.discovery.md` 控制。AI 会分阶段确认：
+用户对 AI 说 `搭建大纲`，AI 会分五阶段引导确认：
 
 1. 故事内核：主题、基调、主角弧线、全书 Objective。
 2. 前台 / 后台双层结构：明面冲突和隐藏真相如何咬合。
@@ -142,17 +129,9 @@ python scripts/structure_report.py
 4. 角色设计：四轮深入讨论（核心人格 → 人格压力测试 → 关系性格张力 → 声音与表达），产出的角色卡包含 Personality Lock、Behavioral Constraints 和压力测试结论，供写作和审阅阶段校验角色行为一致性。
 5. 世界观铁律与禁令：不能违反的设定、类型边界、视角规则。
 
-输出主要写入：
+输出写入 `story/brief.md`、`story/author_intent.md`、`story/outline/`、`story/book_rules.md`、`story/roles/` 等 canonical 文件。
 
-- `story/brief.md`
-- `story/author_intent.md`
-- `story/outline/story_frame.md`
-- `story/outline/volume_map.md`
-- `story/book_rules.md`
-- `story/roles/*.md`
-- `story/current_focus.md`
-
-如果用户已有现成大纲，使用 `story/outline/_template.import-outline.md` 进入“导入现成大纲”流程。导入时，用户大纲默认是 candidate；只有用户确认的内容才进入 canonical 文件。伏笔在导入阶段通常先作为 hook candidate 记录，不直接进入 `pending_hooks.md`。
+如果已有现成大纲，对 AI 说 `导入现成大纲`。AI 会将大纲拆成 candidate / 缺口 / 冲突 / hook candidate，追问必要信息后才确认进入 canonical。伏笔在导入阶段通常先作为 hook candidate 记录，不直接进入 `pending_hooks.md`。
 
 ## 6. Project Librarian 与四 Agent 写作流水线
 
@@ -206,49 +185,9 @@ agents/review.md
 agents/fixer.md
 ```
 
-### 查看已注册的 Subagent 与分配模型
+### Subagent 模型分配
 
-Claude Code 和 Codex CLI 会自动发现 `.claude/agents/` 中的 subagent 注册文件。你可以通过主会话查询当前可用的 subagent 列表，并根据需要为不同 Agent 分配不同模型。
-
-**查询已注册的 subagent：**
-
-```text
-你: 当前项目有哪些可用的 subagent？列出它们的名称和职责。
-
-AI: 当前注册了 5 个 subagent：
-
-| Subagent | 类型 | 职责 | 会话模型 |
-|---|---|---|---|
-| project-librarian | 上下文路由 | 读取规则和状态，生成 Context Packet | 一次性 |
-| novel-writer | Writer 阶段 | 写原始草稿 | 持久 |
-| novel-polish | Polish 阶段 | 去 AI 味、校准文风 | 持久 |
-| novel-review | Review 阶段 | 审阅，找 bug 和漂移 | 持久 |
-| novel-fixer | Fixer 阶段 | 按 Review 报告修复 | 持久 |
-```
-
-**为不同 Agent 分配不同模型：**
-
-Claude Code 支持按 subagent 分配模型。例如在 `.claude/settings.json` 中：
-
-```json
-{
-  "permissions": {
-    "allow": ["Bash(python scripts/*)"]
-  }
-}
-```
-
-或在对话中直接指定：
-
-```text
-你: 写第 3 章时，Writer 用速度更快的模型节省成本，Review 用精度更高的模型保证审阅质量
-
-AI: 好的。已记录：Writer → 快速模型，Review → 高精度模型。
-      Writer 草稿生成更经济高效；
-      Review 审阅检查更全面细致。
-```
-
-这样可以为不同阶段选择不同性价比的模型——起草阶段用快速模型，审阅阶段用高精度模型。
+Claude Code 自动发现 `.claude/agents/` 中的 5 个 subagent。用户可以在对话中为不同阶段分配不同模型——例如"Writer 用快速模型节省成本，Review 用高精度模型保证审阅质量"。AI 会记录并在调度时应用。
 
 ## 7. Canonical 与 Working 边界
 
@@ -364,7 +303,7 @@ candidate → open → progressing → escalated → resolved / dormant / droppe
 | 知识与迁移 | `knowledge_index.py` / `import_inkos_project.py` / `structure_report.py` / `skill_check.py` |
 | 共创辅助 | `review_author_chapter.py` / `polish_author_chapter.py` / `create_project.py` |
 
-脚本只做确定性辅助，不做创作判断。所有脚本不调用 AI 模型、不自动改写正文。
+脚本只做确定性辅助，不做创作判断。所有脚本不调用 AI 模型、不自动改写正文。**这些脚本由 AI 根据流程自动调用，用户无需手动执行。** 无 Python 环境时 AI 手动执行等效检查。
 
 ## 11. Skill 接口
 
@@ -381,25 +320,7 @@ skills/
 - `skills/_template.skill-entry.md`
 - `skills/_template.skill-request.md`
 
-使用方式：
-
-```text
-用户点名 skill
-  ↓
-主会话检查 skill_registry
-  ↓
-未注册则先注册
-  ↓
-运行 scripts/skill_check.py
-  ↓
-创建 skill request
-  ↓
-skill 输出进入 story/runtime/
-  ↓
-final-check 决定是否采纳
-```
-
-Skill 不直接改 canonical 状态。
+使用方式：用户点名 skill 或 chapter plan 声明需要 → AI 检查注册表（未注册则先登记并校验）→ 创建 skill request → skill 输出进入 `story/runtime/` → final-check 决定是否采纳。Skill 不直接改 canonical 状态。
 
 ## 12. 适合的项目
 
@@ -444,31 +365,23 @@ Skill 不直接改 canonical 状态。
 
 ## 15. 推荐工作方式
 
-最推荐的实际使用节奏：
+按自然语言节奏推进，AI 在后台执行所有脚本和检查：
 
 ```text
-搭建大纲 / 导入现成大纲
+搭建大纲 / 导入现成大纲           # AI 自动体检 + 结构检查
   ↓
-doctor + structure_report
+规划第1章                         # AI 自动伏笔审计
   ↓
-规划第1章
+写第1章                           # AI 自动上下文编译 → Writer → Polish → Review → Fixer → 门禁
   ↓
-hook_report + hook_matrix
+继续下一章                         # 复用持久 Agent，AI 自动状态同步
   ↓
-context_builder + prompt_compiler（为 Agent 编译上下文和 prompt）
+写接下来5章                        # 批量流水线，批末自动审计
   ↓
-Writer → Polish → Review → Fixer
-  ↓
-gatekeeper（必须通过）
-  ↓
-text_audit + final-check
-  ↓
-写入 chapters
-  ↓
-chapter_index --write + doctor
+审阅第N章                          # 返修或共创审查
 ```
 
-批量写作时，每章仍然要按顺序提交 canonical 状态，不能先写完多章再统一补状态。共创模式下，作者手写章节后可通过 `审查第N章` 或 `润色第N章 --模式` 调用 AI 辅助。
+批量写作时，每章仍然要按顺序提交 canonical 状态，不能先写完多章再统一补状态。共创模式下，作者手写章节后对 AI 说 `审查第N章` 或 `润色第N章 --模式` 即可。
 
 ## 16. Lineage & Attribution
 

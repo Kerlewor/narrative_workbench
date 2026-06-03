@@ -1,462 +1,220 @@
 # Narrative Workbench / 叙事工作台
 
-面向 Claude Code 与 Codex CLI 的长篇 AI 小说工程框架。为长篇小说提供状态管理、伏笔追踪、角色一致性审查、文风对齐和 AI 辅助流水线——让作者把小说创作当成工程来管理，无论是让 AI 全流程写到完结，还是在关键章节亲自执笔。
+面向 Claude Code 的长篇 AI 小说工程框架。**你对 AI 说话，AI 调度一切。**
 
-支持两种创作模式：**AI 流水线写作**（规划→起草→润色→审阅→修复）和**共创模式**（作者手写 + AI 审查 + AI 按需介入润色）。31 个确定性脚本与本地入口负责检查、索引、门禁、Dashboard、分层 diff、场景卡、角色声线实验和导出，AI 负责创作判断。
+长篇创作的核心困难不在文笔，在工程。
+
+让 AI 直接写长篇，天然有短板：单次输出质量有天花板，几十章后设定悄悄漂移，没人专职检查角色一致性和伏笔回收，AI 腔也会随自由发挥越渗越多。
+
+自己执笔写，也有自己的问题：大纲搭了但不成体系，角色弧光写着写着就断了，第 7 章埋的伏笔到第 40 章忘了提，每次回顾前面都要翻几十个文档——你有创作力，但缺一个帮你记住一切、检查一切的工程系统。
+
+这个框架为这两种情况各准备了一条路。**AI 流水线模式**让你从第 1 章一路写到完结——AI 调度 Writer / Polish / Review / Fixer 四 Agent 接力，每章前后自动做漂移检测和门禁检查。**共创模式**让你自己执笔——写完后 AI 替你审查角色一致性、伏笔遗漏和 AI 腔，按需介入润色，原稿始终不覆盖。
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Claude%20Code%20%7C%20Codex%20CLI-green)
-[![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/)
 
-## 起源与定位
+## 这是什么
 
-本项目受 **[InkOS](https://github.com/Narcooo/inkos)**（AGPL-3.0）启发——InkOS 首创了多 Agent 小说生产流水线、真相文件状态管理和 hook 生命周期追踪的方法论。Narrative Workbench 将这些模式独立重新构想为 Markdown-native prompt 工程框架，并在此基础上扩展了持久 Agent 会话、角色人格深度设计、上下文编译、确定性门禁和共创模式。
+**一个给 AI 用的框架，不是给你用的命令行工具。** 它的"用户界面"就是你跟 AI 说的自然语言。
 
-**定位：** 为有写作追求的作者提供的工程化系统。两种使用方式自由切换——你可以让 AI 从第 1 章一路写到完结（AI 流水线模式），也可以自己手写核心章节、设计大纲，让 AI 负责审查一致性、起草过渡章、局部润色和状态同步（共创模式）。无论哪种模式，伏笔追踪、角色一致性和确定性门禁始终在后台运行——AI 负责记住第 3 章埋的伏笔在第 47 章该回收了。
+- 你说"写第 1 章"，AI 在后台调度 Writer → Polish → Review → Fixer 四个 Agent，跑完门禁检查，把定稿写入正文目录，同步所有状态文件。
+- 你说"继续下一章"，AI 自动确定章号，复用已有的 Agent 会话，不需要你重复交代设定。
+- 你说"审查第 5 章"，AI 对你手写的章节做一致性审查，出问题清单但不改你的原文。
 
-|  | InkOS | Narrative Workbench |
-|---|---|---|
-| **平台** | TypeScript CLI（npm 包） | Claude Code / Codex CLI prompt 框架 |
-| **Agent 模型** | 10 Agent，3 阶段 | 5 Agent，4 阶段 + 持久会话 |
-| **状态后端** | Markdown + SQLite + Zod | Markdown 账本 + JSON 镜像 + Python |
-| **会话** | 无状态（每章新调用） | 持久会话（Agent 跨章存活） |
-| **控制方式** | CLI 命令 | 主会话编排 + Claude Code subagent |
+**31 个确定性检查脚本**在后台默默运行——体检、门禁、伏笔审计、角色漂移检测——你不需要知道它们的名字。AI 会自动调用。
 
-状态文件命名约定（`current_state.md`、`pending_hooks.md` 等）保持与 InkOS 兼容。详见 [ORIGIN.md](ORIGIN.md)。
+本项目受 [InkOS](https://github.com/Narcooo/inkos)（AGPL-3.0）启发并独立构建。详见 [ORIGIN.md](ORIGIN.md)。
 
-> 本项目不是 InkOS 官方项目，也未获得 InkOS 作者背书或维护。"InkOS"名称仅用于说明灵感来源、致谢与兼容性描述。
+**核心能力：**
 
-## 核心特性
+- **四 Agent 流水线** — Writer → Polish → Review → Fixer，职责分离，每个 Agent 只做一件事
+- **伏笔追踪** — 全生命周期管理（open/advance/escalate/resolve），半衰期防遗忘，活跃预算控制
+- **角色一致性** — 四轮深度设计协议 + Personality Lock + 贯穿全链路的角色行为校验
+- **去 AI 味** — style_blacklist 负面清单 + scene-beat 场景施工 + Polish 润色层
+- **知识库** — 领域考据资料索引，写作时自动注入相关知识
+- **文风分析** — 从你的手写样章中提取文风 profile，AI 写作时对齐
+- **Skill 扩展** — 注册制可插拔模块，按需扩展专项能力
+- **共创模式** — 你手写，AI 审查一致性 + 按需润色，互不干扰
 
-- **四 Agent 持久会话：** Writer / Polish / Review / Fixer 在同一主会话内跨章存活，首次创建后无需每章重复发送项目基线。连续处理超 8 章自动重置。
-- **角色四轮设计协议：** 核心人格 → 压力测试 → 关系张力 → 声音表达，产出 Personality Lock 和 Behavioral Constraints，贯穿写作、审阅、审计全链路。
-- **上下文控制：** Project Librarian 生成 Context Packet，区分可跳过/必须读原文的文件。runtime 跨卷自动归档。
-- **完整状态机：** 10 状态章节生命周期，含 `needs-rewrite` 和 `needs-repair` 显式失败回路。
-- **Hook 伏笔系统：** open / advance / escalate / resolve / defer 全生命周期 + 半衰期防遗忘 + 活跃预算控制。
-- **去 AI 味管线：** style_blacklist 负面清单 + scene-beat 场景拆解 + Polish 润色层。
-- **Skill 可插拔扩展 + 本地确定性工具：** 注册制 skill 系统 + 31 个确定性工具与 `nw` 本地入口（上下文工程、流程门禁、知识索引、文风分析、漂移检测、文风拆解、项目迁移、Dashboard、分层 diff、导出）。
+## 我需要装 Python 吗
+
+**不需要。** 没有 Python 环境也能正常使用。AI 会手动执行等效检查，功能完整。
+
+如果你愿意装（`pip install -e ".[test]"`），检查更快更可靠。
 
 ## 快速开始
 
-如果你准备在本机长期使用，建议先安装本地命令：
-
-```bash
-python -m pip install -e ".[test]"
-```
-
-在项目目录中打开 Claude Code，说：
+在 Claude Code 中打开项目目录，然后说话：
 
 ```text
-你: 这是一个 AI 小说项目。请读取 CLAUDE.md。
+你: 创建新项目"临安雪"
 
-AI: 好的。你是否安装了 Python 3？
+AI: 项目已创建。要开始搭建大纲吗？
 
-你: 已安装。
+你: 搭建大纲
 
-AI: [加载完成] 当前是模板目录。要创建新项目吗？告诉我书名即可。
+AI: [分五阶段引导你确认故事内核、双层结构、分卷设计、角色设计、世界观铁律]
 
-你: 创建项目"临安雪"
+你: 写第 1 章
 
-AI: [运行 scripts/create_project.py] 项目已创建。要开始搭建大纲吗？
+AI: [自动跑完整流水线 → Writer 草稿 → Polish 润色 → Review 审阅 → Fixer 修复
+     → 门禁通过 → 写入 chapters/0001_临安雪.md]
 
-你: 搭建大纲                                      # 五阶段从零搭建
-你: 写第1章                                       # 完整流水线
-你: 继续下一章                                    # 持续创作
+你: 继续下一章        # Agent 保持会话，无需重发设定
+你: 继续              # 持续创作，AI 自动推进
 ```
 
-没有 Python 也没关系——AI 会手动执行等效检查。已有大纲时，将 `搭建大纲` 替换为 `导入现成大纲`。
+想先看看项目长什么样？打开 [`examples/linan_snow_demo/`](examples/linan_snow_demo/)——一个完整的演示项目，包含角色卡、伏笔池和示例章节。
 
-如果只想先看看项目长什么样，打开 [`examples/linan_snow_demo/`](examples/linan_snow_demo/)——它是一个完整的最小演示项目，包含角色卡、伏笔池、intent/plan 和一篇手写稿，可以直接跑脚本验证。
+> Windows 用户通过 WSL 或 Git Bash 使用，与 Linux/macOS 完全一致。
 
-> **Windows 用户：** Claude Code 和 Codex 在 Windows 上通过 WSL 或 Git Bash 运行，命令与 Linux/macOS 完全一致。安装本项目后优先使用 `nw`。少数模板初始化和知识索引工具仍保留为仓库脚本；如果在原生 Windows 终端手动运行这些脚本，将 `python3` 替换为 `python`。所有 `&&` 在 CMD 中无效，请逐行运行。
+## 你能对 AI 说什么
 
-## 用户命令
-
-| 命令 | 说明 |
+| 你说 | AI 做什么 |
 |---|---|
-| `搭建大纲` | 五阶段从零搭建新书设定 |
-| `导入现成大纲` | 拆解已有大纲为 canon / candidate / 缺口，主动检测缺失信息 |
-| `深化角色 <角色名>` | 对已有角色按四轮协议补全人格深度 |
-| `规划第 N 章` | 仅创建 intent 与 plan，不启动 Agent |
-| `写第 N 章` | 完整流水线：drift check → 四 Agent → final-check → 状态同步 |
-| `继续下一章` | 自动确定下一章号并执行完整流水线 |
-| `写接下来 3-5 章` | 批量流水线，单批最多 5 章 |
-| `审阅第 N 章` | 根据章节当前状态从适当阶段切入返修 |
-| `审查第 N 章` | 对作者手写章节进行一致性审查，不改正文 |
-| `润色第 N 章 --模式` | 按指定模式润色手写稿（5 种模式可选） |
-| `第 N 章写作简报` | 生成本章写作约束简报（必须处理/禁止/推荐写法） |
+| `搭建大纲` | 五阶段从零搭建新书设定（故事内核→双层结构→分卷→角色→世界观） |
+| `导入现成大纲` | 拆解你已有的大纲，检测缺口和冲突，追问必要信息 |
+| `深化角色 <角色名>` | 对已有角色做四轮深度讨论（人格→压力测试→关系张力→声音表达） |
+| `规划第 N 章` | 生成本章写作约束简报，不启动写作 |
+| `写第 N 章` | 完整流水线：drift check → 四 Agent → 门禁 → 状态同步 |
+| `继续下一章` | 自动确定下一章号，执行完整流水线 |
+| `写接下来 3-5 章` | 批量创作，单批最多 5 章 |
+| `审阅第 N 章` | 根据章节状态从适当阶段切入返修 |
+| `审查第 N 章` | 对你手写的章节做一致性审查，出问题清单，不改原文 |
+| `润色第 N 章 --模式 <模式名>` | 按指定模式润色你的手写稿（5 种模式可选） |
+| `第 N 章写作简报` | 告诉你这一章承担什么功能、必须推进什么、禁止写什么 |
 
-## 四 Agent 写作流水线
+> 以上只是最常用的说法。AI 能理解大部分自然语言——你说"帮我看看第 3 章有没有问题"、"接着写"、"来，搞下一章"、"大纲搭好了，开始写吧"都可以。不需要背命令。
 
-每章的写作由四个 Agent 串行接力，主会话统一调度：
+## AI 写长篇的天然短板
+
+让 AI 直接生成小说章节，会遇到几个固有问题：
+
+- **单次输出质量天花板。** 一个模型同时负责情节推进、语言打磨、伏笔落实、人设一致性——任何一项失手，整章就得返工。
+- **越写越漂移。** 几十章之后，AI 忘了早期的设定细节，角色性格悄悄走样，伏笔开了没人记得回收。
+- **AI 腔渗透。** 自由发挥越多，"作文腔"、主题金句、万能氛围句就越容易渗进正文。
+- **职责混在一起。** 起草、润色、审阅一把抓，结果往往是写完就算，没人真正检查。
+
+## 四 Agent 流水线怎么解决
+
+这个框架把"写一章"拆成四个独立阶段，每个阶段由专门的 Agent 负责：
 
 ```
 主会话: drift check → intent + plan
   ↓
 Writer（原始草稿）
   只管情节、角色、节奏。不润色，不审稿。
-  输出: chapter-000N.writer.md + handoff 摘要
   ↓
 Polish（语言二修）
-  去 AI 味、校准文风、修正格式。不改变情节和事实。
-  输出: chapter-000N.polish.md + handoff 摘要
+  去 AI 味、校准文风。不改变情节和事实。
   ↓
 Review（审阅报告）
-  检查连续性、信息边界、hook 账、人格一致性、文风。只出报告不改文。
-  输出: chapter-000N.review.md
+  检查连续性、信息边界、伏笔账、人格一致性。只出报告不改文。
   ↓ Fixer（按报告修复）
   只修 Review 指出的问题，不自由发挥。
-  输出: chapter-000N.fixer.md
   ↓
-主会话: final-check → 写入 chapters/ → 同步状态
+主会话: 门禁检查 → 最终确认 → 写入正文 → 同步全部状态
 ```
 
-**持久会话：** Writer / Polish / Review / Fixer 首次创建后在同一主会话内持续存活。后续章节无需重复发送项目基线（规则、角色卡、大纲）——主会话每次只发送本章驱动文件（intent + plan + 上一章正文 + 出场角色卡）。
+职责分离之后，每个 Agent 只做一件事——Writer 不用操心文笔，Polish 不用操心剧情，Review 独立于创作过程来审视。漂移问题则由 Review 的角色人格一致性检查 + 主会话的 drift check 在每章写作前后各守一道关。
 
-**失败处理：** Review 判定结构性失败 → `needs-rewrite`，Review 报告发回 Writer 重写。final-check 未通过 → `needs-repair`，final-check 报告发回 Fixer 重新修复。任何状态倒退必须写明原因。
-
-**批量流水线：** 同一章内严格串行。多章批量时，Writer 完成 ChN 后立即收到 ChN+1 任务，同时 Polish 正在处理 ChN——不同章节的 Agent 阶段可流水线重叠。
-
-**Subagent 与模型分配：** Claude Code 自动发现 `.claude/agents/` 中的 5 个 subagent。你可以在对话中查询可用 subagent 列表，并为不同阶段分配不同模型——例如 Writer 用快速模型节省成本，Review 用高精度模型保证审查质量。详见 [PROJECT_INTRO.md](PROJECT_INTRO.md)。
-
-## Skill 扩展机制
-
-Skill 是可插拔的专项能力模块，用于扩展写作流水线的特定环节。适用场景：特定题材知识（如医学考据、古代官制）、专项文风规则、章节审校清单、战斗/悬疑/恋爱等专项构造。
-
-**注册与调用：**
-
-```
-用户点名 skill 或 plan 声明需要
-  ↓
-主会话检查 skills/skill_registry.md → 已注册？→ 读取入口说明 → 创建 skill request
-                                        ↓ 未注册
-                                   按模板登记到 registry →
-                                   运行 skill_check.py 验证 →
-                                   创建 skill request
-  ↓
-skill 输出进入 story/runtime/chapter-000N.skill-SKILLNAME.md
-  ↓
-主会话 final-check 时决定采纳/拒绝
-```
-
-**边界：** skill 不直接改正文和 canonical 状态。skill 输出与项目禁令冲突时，以项目禁令为准。
+Agent 是持久会话——首次创建后跨章存活，后续章节无需重发项目设定。连续处理超 8 章后自动重置，防止上下文膨胀。
 
 ## 共创模式
 
-在"AI 全流程写作"之外，v0.2.0 新增了"作者手写 + AI 辅助"的共创模式，面向有写作能力、需要工程化辅助的作者。三种指令覆盖了写作前、写作后和修改阶段：
+如果你自己执笔写章节，框架同样有用。你写完之后对 AI 说 `审查第 N 章`——Review Agent 会对你的手写稿做一致性审查，出问题清单但不改原文。需要局部调整时，`润色第 N 章 --模式 <模式名>` 提供五种精准润色模式（去 AI 味、文风对齐、对白修整等），改动标注位置和原因，原稿不覆盖。
 
-```
-写作前：第 N 章写作简报
-  ↓  系统根据该章在卷纲中的位置和当前项目状态，生成约束简报——
-  ↓  本章类型、必须推进的伏笔、禁止泄露的信息、推荐写法。
-  ↓  不是替作者写，而是告诉作者这一章承担什么功能。
+## Skill 扩展
 
-写作后：审查第 N 章
-  ↓  Review Agent 对作者手写章节进行一致性审查。
-  ↓  不改正文，只出问题清单：角色人格违背、伏笔遗漏、秘密泄露风险、
-  ↓  状态冲突、节奏失衡、AI 味。每条标注位置和修改方向。
-
-修改时：润色第 N 章 --模式 <模式名>
-  ↓  5 种润色模式，默认不覆盖原稿，所有改动标注位置和原因。
-```
-
-| 润色模式 | 说明 |
-|---|---|
-| `preserve-author-style` / `light` | 只改病句、重复、节奏，最大保留作者表达 |
-| `project-style-align` / `style` | 按项目文风 profile 对齐句长、对白密度、段落形态 |
-| `anti-ai-only` / `anti-ai` | 只去 AI 味：模板感、解释感、抽象情绪词 |
-| `dialogue-only` / `dialogue` | 只修对白，让角色声音与角色卡的对白风味对齐 |
-| `rhythm-only` / `rhythm` | 只调节奏：段落长短、高压喘息比例、章尾落点 |
-
-### 分层 diff 决策（v0.5）
-
-共创润色不把全部修改塞进对话上下文。Claude Code / Codex 只显示修改总览和下一步操作，完整内容写入 Markdown，真正可执行的修改候选写入 JSONL：
-
-```bash
-nw diff generate --chapter 5 \
-  --original chapters/drafts/chapter-0005.author.md \
-  --revised story/runtime/chapter-0005.polish.md
-
-nw diff show --chapter 5 --id 03
-nw diff apply --chapter 5 --accept 01,03 --reject 02
-```
-
-未安装本项目时，可以用仓库内兼容入口执行同样命令：
-
-```bash
-python scripts/nw diff generate --chapter 5 --original chapters/drafts/chapter-0005.author.md --revised story/runtime/chapter-0005.polish.md
-```
-
-产物：
+如果你需要专项能力——比如"宋代官制审查"、"医学考据校验"、"战斗场景构造"——直接告诉 AI：
 
 ```text
-story/runtime/chapter-0005.diff_index.md          # 可扫描索引
-story/runtime/diffs/chapter-0005/patch-0003.md    # 单条详情
-story/runtime/chapter-0005.patch_candidates.jsonl # 程序执行数据
-chapters/drafts/chapter-0005.author.v2.md         # 应用后的新版本
-story/runtime/chapter-0005.decision_log.md        # 作者决策记录
+你: 我想注册一个"宋代官制审查"skill，用来检查小说中的官职描写是否准确
+
+AI: 好的。请简单描述检查逻辑和触发条件。
+
+你: 当章节涉及官员出场时触发。检查官职名是否属于南宋、品级与权力是否匹配。
+
+AI: [登记 → 验证 → 注册完成] Skill "song-dynasty-official-review" 已就绪。
+     后续章节涉及官员出场时我会自动调用它。
 ```
 
-## 本地命令与脚本
+你也可以随时说"调用 xxx skill 检查第 N 章"。Skill 不直接改正文，输出由你最终决定是否采纳。
 
-### 环境检测
+## 知识库
 
-每次会话启动时，AI 会首先询问你的 Python 环境状态。两种模式功能完整：
+小说写作经常涉及专业领域知识——医学考据、古代官制、武术流派、历史细节。这些内容不属于"本书设定"（那是大纲和角色卡的事），而属于"现实世界知识"。你可以把考据资料放进 `story/knowledge/` 目录，然后告诉 AI：
 
-| 模式 | 说明 |
-|---|---|
-| **有 Python 3 环境** | 31 个脚本负责文件完整性、JSON 合法性、hook 半衰期、文本审计、Dashboard、分层 diff、场景卡、角色声线实验和导出等确定性工作，AI 负责创作判断 |
-| **无 Python 或不使用** | AI 手动执行等效检查（逐项验证文件、计算半衰期、扫描禁止模式等），产物标注 `(manual)`，功能完整但可靠性略低于脚本 |
+```text
+你: 我在 story/knowledge/ 下放了南宋太医院职官、
+    《太平惠民和剂局方》摘要和宋代都城布局三份考据资料。帮我建索引。
 
-建议安装方式：
+AI: 索引完成：扫描到 3 个知识领域、47 条实体记录。
+     后续写作时我会自动关联相关知识。
 
-```bash
-python -m pip install -e ".[test]"
+你: 写第 3 章     # 本章涉及太医院内部场景
+
+AI: [上下文包已注入太医院职官体系、宋代方剂知识]
+     Writer 在写作时可引用这些参考，确保医学描写准确。
 ```
 
-这会安装运行所需的 `PyYAML` 和测试所需的 `pytest`，并注册 `nw` 本地命令。安装后，常用命令应写成：
+知识库是"图书馆"，Skill 是"研究员"——Skill 可以查询知识库来校验章节，但知识库本身是唯一的事实来源。
 
-```bash
-nw doctor
-nw dashboard
-nw gatekeeper --chapter 12 --stage final
-nw diff generate --chapter 12 --original chapters/drafts/chapter-0012.author.md --revised story/runtime/chapter-0012.polish.md
-nw scene create --chapter 12 --id scene_01 --title "旧站台入口"
-nw voice-lab --character 林安 --line "你为什么知道这块雪牌？"
-nw export --format docx --output exports/book.docx
+## 文风分析
+
+如果你有自己的手写样章，可以让 AI 分析你的文风，用于后续对齐：
+
+```text
+你: 分析我手写的那章文风
+
+AI: 生成三份文件：
+    - 文风分析报告：第三人称限知，短中句为主，情绪通过动作呈现...
+    - 文风量化 profile
+    - 文风 Skill：Prefer 用动作承载情绪；Avoid 直接总结人物心理...
+
+     是否将文风 Skill 注册到项目？这样后续 AI 写作时会自动对齐你的文风。
 ```
 
-如果没有安装本项目，也可以继续使用仓库内入口：
+## 已知限制
 
-```bash
-python scripts/nw doctor
-python scripts/nw dashboard
-```
+- **文笔上限受模型能力限制。** 框架通过负面清单和 Polish 层约束下限，但文学品质仍取决于底层模型。
+- **门禁通过 ≠ 章节合格。** 确定性检查只能验证流程完整性和格式，创作质量的最终判断在你和主会话 AI。
+- **长篇项目状态文件随章节数增长。** 数百章后`chapter_summaries.md`等文件会很大，AI 已支持按卷分段，但超长项目仍需留意。
+- **目前没有 Web UI 或自动调度器。** 交互式使用完全够用，但不适合无人值守的批量生成。
 
-### 脚本分类
-
-31 个确定性工具按功能分为七组。安装后，作者体验类命令优先通过 `nw` 调用；模板创建、知识索引、迁移、Skill 校验等工具继续保留脚本入口，方便 AI 会话按需直接调用。
-
-| 类别 | 脚本 | 说明 |
-|---|---|---|
-| **体检与索引** | `doctor.py` / `chapter_index.py` / `status.py` | 项目健康检查、章节索引生成、项目状态概览 |
-| **Hook 审计** | `hook_report.py` / `hook_matrix.py` | 活跃 hook 预算、半衰期到期、依赖环检测 |
-| **上下文引擎** | `relevance_resolver.py` / `context_builder.py` / `prompt_compiler.py` / `gatekeeper.py` | 精确上下文注入、按 Agent 构建上下文包、三层 prompt 编译、确定性门禁 |
-| **账本与视图** | `ledger_manager.py` / `render_views.py` | 结构化小说账本 CRUD、Markdown 视图渲染 |
-| **章节统筹** | `director_sheet.py` | 章节导演表生成与验证 |
-| **平台适配** | `sync_skills.py` | Skills 同步到 .claude/skills/ 和 .agents/skills/ |
-| **文风与角色** | `style_report.py` / `character_drift_report.py` / `decompose_style.py` / `text_audit.py` | 句长/对白密度分析、角色漂移预警、文风拆解、文本审计 |
-| **知识与迁移** | `knowledge_index.py` / `import_inkos_project.py` / `structure_report.py` / `skill_check.py` | 项目知识索引、InkOS 项目迁移、结构覆盖检查、Skill 注册校验 |
-| **共创辅助** | `review_author_chapter.py` / `polish_author_chapter.py` / `create_project.py` | 手写稿审查简报、手写稿润色简报、新项目创建 |
-| **作者体验** | `dashboard.py` / `diff_workflow.py` / `scene_card.py` / `voice_lab.py` / `export_book.py` / `nw` | Markdown 控制台、分层 diff、场景卡、角色声音实验室、EPUB/DOCX/Markdown 导出、统一本地入口 |
-
-**所有脚本都是确定性工具——不调用 AI 模型、不自动改写正文、不替代主会话的创作判断。** 审查和润色脚本生成的是结构化任务包，真正的语义审查/润色由 Claude Code/Codex 的 Agent 完成。
-
-运行门禁见 `RUN_RULES.md`。详细说明见 [`scripts/README.md`](scripts/README.md)。演示项目见 [`examples/linan_snow_demo/`](examples/linan_snow_demo/)。
-
-## 知识库系统
-
-知识库用于储存小说所需的专业领域知识——医学考据、古代官制、武术流派、历史细节等。这些内容不属于"本书设定"而属于"现实世界知识"，不适合塞进角色卡或世界观铁律。
-
-### 构建索引
-
-```bash
-python scripts/knowledge_index.py build
-```
-
-扫描项目文件（角色卡、大纲、章节、伏笔池），提取实体和文件元数据，生成 `.nw_index/entity_index.json`。
-
-### 查询与生成知识包
-
-按章节生成知识包（供 context_builder 和 prompt_compiler 使用）：
-
-```bash
-python scripts/knowledge_index.py query --chapter 12 --agent writer
-```
-
-按领域和关键词查询：
-
-```bash
-python scripts/knowledge_index.py query --domain 中医方剂 --keyword 金疮药
-```
-
-### 知识库与 Skill 的关系
-
-知识库是领域事实的单一权威来源。Skill 是纯方法论层——它描述"怎么检查"但不拥有"用来检查的事实"。Skill 运行时通过 `knowledge_index.py --query` 获取相关事实，校验报告的每条建议都引用知识库条目编号。设计原则：**知识库是图书馆，Skill 是研究员。研究员可以查资料，但不能自己编资料。**
+当前版本：**v0.5.0**。详细路线图见 [ROADMAP.md](ROADMAP.md)。
 
 ## 目录结构
 
-```text
-CLAUDE.md / AGENTS.md / START_HERE.md / RUN_RULES.md    启动协议、脚本门禁
-PROJECT_INTRO.md / ORIGIN.md / LICENSE                   项目介绍、起源、AGPL-3.0
+想了解框架内部布局的话，主要目录长这样：
 
-workflow/          系统原则与章节生命周期
-.claude/agents/    Claude Code subagent 注册（薄路由层）
-.claude/skills/    Claude Code 原生 Skills 入口
-.agents/skills/    Codex 原生 Skills 入口（同步脚本生成）
-.codex/            Codex Agent 注册 + hooks.json
-agents/            各 Agent 详细职责 prompt
+```text
+chapters/          正文章节（AI 写入的最终定稿）
 story/
-  outline/         故事框架、分卷地图、扩写蓝图
-  runtime/         每章 intent/plan + Agent 产出 + 模板
-  ledger/          结构化事实账本（JSONL，7 类）
-  views/           作者可读 Markdown 视图（脚本生成）
-  plans/           章节导演表（YAML）
-  roles/           角色卡（含 Personality Lock）
+  outline/         故事框架、分卷地图
+  roles/           角色卡（含人格锁定和行为约束）
+  runtime/         Agent 工作区（草稿、审阅报告等中间产物）
+  ledger/          结构化事实账本（伏笔、角色弧光等，JSONL 格式）
+  views/           作者可读视图（账本的 Markdown 渲染版）
+  knowledge/       你的考据资料（AI 自动建索引）
   state/           JSON 状态镜像
-  style_samples/   用户风格样本
-skills/            可插拔 skill 接口与注册表（正式来源）
-scripts/           31 个确定性辅助脚本与本地入口
-chapters/          正文章节（000N_标题.md）
-tests/             回归测试
+  style_samples/   你的风格样本
+skills/            可插拔 Skill 注册表
+scripts/           31 个检查脚本（AI 自动调用，你不需要碰）
+workflow/          系统原则与章节生命周期文档
+.claude/agents/    四 Agent + Project Librarian 注册文件
 ```
 
-## 使用示例
+## 深入了解
 
-### 从零搭建到持续创作
-
-```text
-用户: 搭建大纲
-
-AI:   好的。先确认基础定位——
-      这本书一句话讲什么？
-
-用户: 南宋绍兴年间，一个精通医术的女子为躲避金兵追杀，
-      伪装身份混入太医院，却卷入了宫廷内部的权力斗争。
-
-AI:   [... 五阶段大纲搭建完成，产出 story_frame.md、
-       volume_map.md、book_rules.md、角色卡、character_matrix.md]
-
-用户: 深化角色 林半夏
-
-AI:   [四轮讨论完成，角色卡补全 Personality Lock、
-       压力测试结论、对白风味和动作锚点]
-
-用户: 写第1章
-
-AI:   [drift check] → [创建 intent/plan] →
-      [Writer] 草稿 → [Polish] 润色 → [Review] 审阅 → [Fixer] 修复 →
-      [gatekeeper 通过] → [final-check 通过] → chapters/0001_临安雪.md
-
-用户: 继续下一章          # 复用持久 Agent，无需重发基线
-用户: 写接下来5章         # 流水线重叠，批末 audit
-用户: 继续                # 跨卷自动归档 → 第 2 卷...
-```
-
-### 注册并使用 Skill
-
-```text
-用户: 我想注册一个"宋代官制审查"skill，
-      用来检查小说中的官职描写是否准确。
-
-AI:   好的。请简单描述这个 skill 的检查逻辑和触发条件。
-
-用户: 当章节涉及官员出场时触发。检查官职名是否属于南宋、
-      品级与权力是否匹配、官员称谓是否合理。
-
-AI:   [登记到 skills/skill_registry.md] →
-      [运行 skill_check.py 验证] → 注册完成
-
-      Skill "song-dynasty-official-review" 已注册（状态: enabled）。
-      后续章节中如果涉及官员出场，我会自动调用该 skill 进行审查。
-      你也可以随时说"调用 song-dynasty-official-review 检查第 3 章"。
-```
-
-### 共创模式：手写章节后调 AI 审与修
-
-```text
-用户: 审查第 5 章
-      # 用户手写了 Ch5，想让 AI 审查但不改原文
-
-AI:   [读取 chapters/drafts/chapter-0005.author.md] →
-      [Review 审查完成，输出问题清单] →
-      发现 3 个问题：林半夏在第 3 场对陌生人透露了身份（角色约束违反）；
-      H017 到期未推进；章尾使用了抽象情绪总结句。
-      是否要逐条处理？
-
-用户: 润色第 5 章 --模式 anti-ai
-
-AI:   [Polish 按 anti-ai-only 模式处理] →
-      删除了 4 处"某种难以言说的"、2 处"不是……而是……"，
-      将章尾总结句改为物件落点。改动已标注位置和原因。
-      原稿未覆盖，润色稿在 story/runtime/chapter-0005.author_polish_anti-ai.md。
-```
-
-### 构建知识库并用于写作
-
-```text
-用户: 我在 story/knowledge/ 下放了南宋太医院职官、
-      《太平惠民和剂局方》摘要和宋代都城布局三份考据资料。
-      帮我建索引。
-
-AI:   [knowledge_index.py build] →
-      索引完成：扫描到 3 个知识领域、47 条实体记录。
-      已生成 .nw_index/entity_index.json。
-
-用户: 写第 3 章     # 本章涉及太医院内部场景
-
-AI:   [context_builder --chapter 3 --agent writer] →
-      [knowledge_index query --chapter 3 --agent writer] →
-      上下文包已注入：太医院职官体系（KB:F001-F012）、
-      宋代方剂知识（KB:F030-F045）。
-      Writer 在写作时可引用这些参考，确保医学描写准确。
-```
-
-### 文风拆解
-
-```text
-用户: 分析我手写的那章文风
-
-AI:   [decompose_style.py --input chapters/drafts/chapter-0001.author.md] →
-      生成三个文件：
-      - style_analysis.md：第三人称限知，短中句为主，情绪通过动作呈现...
-      - style_profile.json：{"pov": "third_person_limited", ...}
-      - style_skill.md：Prefer 用动作承载情绪；Avoid 直接总结人物心理...
-
-      是否将 style_skill.md 注册为项目 Skill？
-      这样后续 AI 辅助时会自动对齐你的文风。
-```
-
-## 已知问题与限制
-
-- **文笔上限受模型能力限制。** 框架通过 style_blacklist、scene-beat 和 Polish 层约束文笔下限，但文学品质仍取决于底层模型。
-- **Python 脚本只做确定性检查，不做语义判断。** gatekeeper 通过不代表章节质量合格——只代表流程完整。创作质量的最终判断权在主会话和作者。
-- **知识库第一版基于关键词和元数据，不支持语义检索。** 精确匹配可能漏掉相关但措辞不同的内容。后续版本可考虑引入 embedding 检索。
-- **长篇项目状态文件随章节数线性增长。** `chapter_summaries.md` 和 `emotional_arcs.md` 已支持按卷分段，但数百章后仍需人工管理。
-- **共创模式的手写稿路径约定为 `chapters/drafts/`，** 首次使用时由 AI 自动创建。
-- **InkOS 迁移器仅处理文件级映射。** SQLite memory.db、Zod JSON delta 和 `particle_ledger.md` 等 InkOS 特有组件无法自动迁移，会标记为"需手动审核"。
-- **目前没有 Web UI 或后台自动调度器。** 调度完全由主会话通过 CLAUDE.md 协议完成，适合交互式使用但不适合无人值守的批量生成。
-
-## 更新计划
-
-当前版本：**v0.5.0**。本版本完成 Markdown-native 作者体验增强：`story/DASHBOARD.md` 写作控制台、分层共创 diff、场景卡、角色声音实验室、EPUB/DOCX/Markdown 导出、`nw` 本地入口和结构化 JSON 输出。项目仍面向 Claude Code / Codex 用户，不提供独立图形界面。
-
-详细路线图见 **[ROADMAP.md](ROADMAP.md)**（涵盖核心诊断、版本路线、产品定位与实现方案）。
-
-### 版本概览
-
-| 版本 | 主题 | 核心交付 | 状态 |
-|---|---|---|---|
-| **v0.2.2** | 正确性修复 | prompt_compiler bug 修复、Context Builder 精准筛选、5000 字符截断修复（已在 v0.3.0 中完成） | ✅ 已完成 |
-| **v0.3** | 平台原生化 + Context Engine | CLAUDE.md 精简/AGENTS.md 新增、结构化账本（JSONL+Views）、Relevance Resolver、Skills 同步、章节导演表+接力卡 | ✅ 已完成 |
-| **v0.4** | 架构优化与工作流增强 | core/ 模块体系、回归测试扩展、跨章节上下文完整性改进、异常处理增强。面向 CC/Codex 用户，无独立 CLI | ✅ 已完成 |
-| **v0.5** | 作者体验增强 + 本地入口 | 写作控制台（DASHBOARD）、分层 diff 报告、场景卡、角色声音实验室、版本化候选稿与决策日志、文笔拆解、EPUB/DOCX/Markdown 导出、`nw` 本地入口、结构化 JSON 输出 | ✅ 已完成 |
-| **v0.6+** | 开源线持续迭代 | 场景卡交互增强、角色工具完善、社区 Skill 生态、多语言支持、第三方 AI 平台适配 | 规划中 |
-
-### 产品定位
-
-v0.3.0 完成了平台原生化（Claude Code + Codex 双入口）。v0.4.0 完成内部架构优化，通过 `core/` 模块体系提升代码可维护性与测试覆盖，同时保持 Claude Code / Codex Agent 用户的调用方式不变。v0.5.0 在此基础上补齐 Markdown-native 作者体验，后续开源版本继续迭代写作工作流、角色工具和 Skill 生态。详见 [ROADMAP.md](ROADMAP.md)。
-
-## 深入阅读
-
-- [CLAUDE.md](CLAUDE.md) — 完整工作流协议与 Agent 架构
-- [ROADMAP.md](ROADMAP.md) — v0.5.0+ 详细改进路线图（核心诊断、版本路线、产品定位、实现方案）
-- [PROJECT_INTRO.md](PROJECT_INTRO.md) — 系统设计理念与组件说明
-- [ORIGIN.md](ORIGIN.md) — InkOS lineage、借鉴清单、独立构建内容、架构对比
-- [story/system_protocol.md](story/system_protocol.md) — 系统边界、状态机、反馈回路、定稿门禁
+- [PROJECT_INTRO.md](PROJECT_INTRO.md) — 系统架构、设计理念、组件说明
+- [ROADMAP.md](ROADMAP.md) — 各版本已交付内容与后续改进路线
+- [ORIGIN.md](ORIGIN.md) — InkOS 起源、致谢、独立构建内容清单
+- [CLAUDE.md](CLAUDE.md) — AI 操作协议（写给 AI 看的，好奇可以翻翻）
+- [examples/linan_snow_demo/](examples/linan_snow_demo/) — 完整演示项目
 
 ## 许可证
 
-本项目以 [GNU Affero General Public License v3.0](LICENSE) 发布。简单说：你可以自由使用、修改和分发本项目，但必须以相同协议开源你的修改版本，且通过网络使用本框架的服务也需要提供源码。
+以 [GNU Affero General Public License v3.0](LICENSE) 发布。你可以自由使用、修改和分发，但必须以相同协议开源修改版本。
 
-InkOS 同样以 AGPL-3.0 发布。本项目的许可证选择与其保持兼容。
+受 [InkOS](https://github.com/Narcooo/inkos)（AGPL-3.0）启发并保持许可证兼容。
