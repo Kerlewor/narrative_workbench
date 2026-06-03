@@ -11,10 +11,6 @@
 | import_outline | 搭建或导入现成大纲 | 搭建大纲 / 导入大纲 | `skills/import_outline/prompt.md` | `story/outline/` | enabled |
 | deepen_character | 对角色进行四轮深度讨论 | 深化角色 / 角色深度讨论 | `skills/deepen_character/prompt.md` | `story/roles/` | enabled |
 | example-style-skill | 示例：专项文风规则 | 用户明确要求或 plan 声明 | `skills/_template.skill-entry.md` | `story/runtime/*.skill-example-style-skill.md` | disabled |
-| nw-product-flow-architect | 鸿蒙 App 页面流程架构设计 | 新增功能前 / 设计页面导航 | `skills/nw-product-flow-architect/prompt.md` | `story/runtime/*.product-flow.md` | enabled |
-| nw-editor-state-guard | 编辑器状态安全铁律 | 编辑页/AI生成/导航相关代码变更 | `skills/nw-editor-state-guard/prompt.md` | `story/runtime/*.state-guard.md` | enabled |
-| nw-harmony-ui-system | 鸿蒙 App 统一视觉系统 | UI 代码编写 / 视觉一致性审查 | `skills/nw-harmony-ui-system/prompt.md` | `story/runtime/*.ui-system.md` | enabled |
-| nw-user-journey-tester | 用户路径测试 | 功能完成后 / 发版前 | `skills/nw-user-journey-tester/prompt.md` | `story/runtime/*.journey-test.md` | enabled |
 
 ## 状态说明
 
